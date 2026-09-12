@@ -1,33 +1,53 @@
-COLOCA AQUÍ LA MASCOTA OFICIAL DE BARRÓN
-========================================
+MASCOTA OFICIAL DE BARRÓN · CÓMO DEJARLA LISTA
+==============================================
 
-Nombre recomendado del archivo (uno de estos):
+La página espera este archivo (prueba estos formatos en este orden):
 
-    logo-barron.png      ← preferido (PNG transparente original)
+    logo-barron.png      ← preferido (PNG con FONDO TRANSPARENTE)
     logo-barron.jpg
     logo-barron.jpeg
     logo-barron.webp
     logo-barron.svg
 
-La página prueba esos formatos en ese orden: guarda el archivo con ese nombre
-en esta carpeta y la mascota aparece sola en la cabecera. No hay que tocar
-ninguna otra línea de código.
+En cuanto exista uno de ellos, la mascota aparece sola en la cabecera,
+sobre el halo amarillo/naranja. No hay que tocar ninguna línea de código.
 
-Recomendaciones (para que cargue rápido en el celular):
 
-  - FONDO TRANSPARENTE (el original, sin redibujar ni modificar).
-  - Tamaño ideal: 400 x 400 px (o 512 x 512 px). Peso: menos de 150 KB.
-  - Si pesa mucho, comprímelo manteniendo la transparencia
-    (p. ej. tinypng.com o squoosh.app). Se muestra a 196 px de ancho.
+SI TU IMAGEN VIENE CON FONDO (por ejemplo, el degradado amarillo-naranja)
+-------------------------------------------------------------------------
+Usa la herramienta incluida, que le quita el fondo SIN MODIFICAR EL DIBUJO
+(solo borra los píxeles del fondo; el contorno negro, el rojo y el blanco del
+personaje quedan intactos, pixel a pixel):
 
-También se usa este mismo archivo como:
+    python3 herramientas/quitar-fondo-logo.py "ruta/a/tu imagen.png"
+
+Genera tres archivos en esta misma carpeta:
+
+    logo-barron.png                 PNG con fondo TRANSPARENTE  ← lo usa la página
+    logo-barron-fondo-blanco.png    PNG con fondo BLANCO         ← para imprimir o compartir
+    favicon-64.png                  ícono 64x64 para la pestaña del navegador
+
+Cómo funciona: hace un relleno por difusión desde los bordes de la imagen, así
+que sigue el degradado del fondo hasta chocar con el contorno negro del
+personaje y se detiene. NO borra "por color", por eso el rojo de la mascota se
+conserva aunque el fondo también sea rojo.
+
+Requiere pillow y numpy:  pip install pillow numpy
+
+
+RECOMENDACIONES DEL ARCHIVO FINAL
+---------------------------------
+  - Fondo TRANSPARENTE, sin redibujar ni modificar la mascota.
+  - 400 a 512 px de ancho. Menos de 150 KB.
+  - Márgenes parejos alrededor del personaje (la herramienta los deja solos).
+
+Se usa además como:
   - ícono al "Agregar a pantalla de inicio" del celular (manifest),
-  - imagen de vista previa al compartir el enlace por WhatsApp.
+  - imagen de vista previa al compartir el enlace por WhatsApp (og:image).
 
-Opcional: si quieres que la pestaña del navegador muestre la mascota en vez
-del recuadro con la "B", reemplaza también el archivo  favicon.svg  de esta
-carpeta por uno llamado  favicon.png  y actualiza la línea <link rel="icon">
-en index.html (una sola línea).
+Opcional: para que la PESTAÑA del navegador muestre la mascota en vez del
+recuadro con la "B", cambia una línea en index.html:
 
-Mientras el archivo no exista, la página muestra un recuadro discreto
-"LOGO BARRÓN" en su lugar. Nunca se genera ni se dibuja otra mascota.
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+                                      ↓
+    <link rel="icon" href="assets/img/favicon-64.png" type="image/png">

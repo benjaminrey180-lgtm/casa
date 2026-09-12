@@ -10,6 +10,8 @@ más el degradado amarillo → naranja → rojo en detalles y bordes.
 casa/
 ├── index.html                 · la página completa (todo el contenido)
 ├── manifest.webmanifest       · para "Agregar a pantalla de inicio"
+├── herramientas/
+│   └── quitar-fondo-logo.py   · quita el fondo de la mascota sin alterarla
 ├── assets/
 │   ├── css/styles.css         · diseño, animaciones, responsive
 │   ├── js/config.js           · ★ ÚNICO ARCHIVO A EDITAR PARA LOS ENLACES
@@ -24,11 +26,23 @@ casa/
 
 ## 1. Colocar la mascota
 
-Guarda el PNG **original con fondo transparente** en `assets/img/` con el nombre
+Guarda el PNG **con fondo transparente** en `assets/img/` con el nombre
 `logo-barron.png` (también acepta `logo-barron.jpg`, `.jpeg`, `.webp` o `.svg`).
-Aparece sola en la cabecera (recomendado: 400×400 px, < 150 KB).
+Aparece sola en la cabecera, sobre el halo amarillo/naranja (recomendado: 400–512 px, < 150 KB).
 No está redibujada ni reemplazada por otra mascota: mientras falte el archivo,
 se muestra un recuadro discreto "LOGO BARRÓN".
+
+### Quitar el fondo automáticamente
+
+Si la imagen viene con fondo (p. ej. el degradado amarillo-naranja), usa la utilidad incluida:
+
+```bash
+python3 herramientas/quitar-fondo-logo.py "ruta/a/tu imagen.png"
+```
+
+Borra **solo los píxeles del fondo** (relleno por difusión desde los bordes): el contorno negro,
+el rojo y el blanco de la mascota quedan intactos, sin redibujar nada. Deja además
+`logo-barron-fondo-blanco.png` (para imprimir/compartir) y `favicon-64.png`.
 
 ## 2. Poner los enlaces reales
 
