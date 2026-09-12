@@ -38,12 +38,15 @@ Abre **`assets/js/config.js`** y completa solo las líneas marcadas con `// TODO
 |---|---|---|
 | `enlaces.googleReviewUrl` | **Tu enlace corto de reseña**: `https://g.page/r/XXXX/review` (el que termina en `/review` abre directo el formulario de estrellas) | ⬜ pendiente |
 | `enlaces.googlePlaceId` | Alternativa (`ChIJ...`) — arma sola el enlace directo a estrellas | ⬜ opcional |
-| `enlaces.whatsappNumero` | Número con código de país, sin `+` ni espacios (ej. `56912345678`) | ⬜ pendiente |
-| `enlaces.whatsappComunidad` | Invitación del canal (`https://whatsapp.com/channel/...`) | ⬜ pendiente |
+| `enlaces.whatsappComunidad` | Invitación del canal (`https://whatsapp.com/channel/...`) — **único acceso a WhatsApp** | ⬜ pendiente |
+| `enlaces.ofertas` | Destino real de las ofertas (ya **no** usa Instagram). Si no quieres la tarjeta: `mostrarOfertas: false` | ⬜ pendiente |
 | `enlaces.ionGroup` | Instagram / WhatsApp / web de ION GROUP | ⬜ pendiente |
 | `enlaces.instagram` | `https://www.instagram.com/barron.cl/` | ✅ ya puesto |
+| `enlaces.tiktok` | `https://www.tiktok.com/@barroncl` | ✅ ya puesto |
 | `enlaces.googleMaps` | Búsqueda de la dirección en Maps | ✅ ya puesto |
-| `enlaces.ofertas` | Destino real de las ofertas (ya **no** usa Instagram). Si no quieres la tarjeta: `mostrarOfertas: false` | ⬜ pendiente |
+
+Las 4 tarjetas principales son: **Comunidad Barrón** (con el logo de WhatsApp) · **Instagram** · **TikTok** · **Google Maps**.
+La tarjeta de WhatsApp directo fue eliminada.
 
 > Sin datos reales no se inventó ninguna URL: los botones que aún no tienen enlace
 > muestran el aviso *"Este enlace se está configurando"* en vez de llevar a un lugar equivocado.

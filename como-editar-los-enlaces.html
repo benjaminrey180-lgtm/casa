@@ -5,7 +5,7 @@
 <title>SUPERMERCADO BARRÓN · Cómo editar los enlaces</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  :root{ --red:#C8102E; --yellow:#FFC72C; --orange:#F2A413; --blue:#0B4EA2; }
+  :root{ --red:#C8102E; --yellow:#FFC72C; --orange:#F2A413; --blue:#0B4EA2; --green:#1FA855; }
   *{box-sizing:border-box}
   body{margin:0;background:#fff;color:#14161A;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
        line-height:1.6;padding:28px 18px 60px;max-width:720px;margin-inline:auto;position:relative}
@@ -17,26 +17,28 @@
   li{position:relative;padding:15px 16px 15px 52px;border:1px solid rgba(17,24,39,.10);
      border-radius:18px;background:#fff;box-shadow:0 8px 22px -12px rgba(17,24,39,.20);font-size:14px}
   li::before{counter-increment:s;content:counter(s);position:absolute;left:14px;top:14px;width:26px;height:26px;
-     display:grid;place-items:center;border-radius:9px;font-weight:800;font-size:13px;color:#fff;
-     background:linear-gradient(115deg,var(--yellow),var(--orange) 45%,var(--red));color:#2a0d00}
+     display:grid;place-items:center;border-radius:9px;font-weight:900;font-size:13px;color:#2a0d00;
+     background:linear-gradient(115deg,var(--yellow),var(--orange) 45%,var(--red))}
   b{color:#14161A}
   code{background:#F5F7FA;border:1px solid rgba(17,24,39,.07);padding:2px 7px;border-radius:7px;font-size:12.5px;color:var(--blue);word-break:break-all}
   .tag{display:inline-block;font-size:10.5px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;
        color:var(--blue);margin-bottom:2px}
-  footer{margin-top:26px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#8A919E}
+  .ok{color:var(--green);font-weight:900}
+  footer{margin-top:26px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#6E7684}
   strong.ion{color:var(--blue)}
 </style>
 </head>
 <body>
   <h1>Cómo editar los enlaces</h1>
   <p>Todo se cambia en un solo archivo: <code>assets/js/config.js</code>. No hay que tocar el diseño.</p>
+  <p>Las 4 tarjetas de la página son: <b>Comunidad Barrón</b> (WhatsApp) · <b>Instagram</b> · <b>TikTok</b> · <b>Google Maps</b>.
+     La tarjeta de WhatsApp directo se quitó: ahora el único acceso a WhatsApp es el canal Comunidad Barrón.</p>
   <ol>
     <li><span class="tag">Reseña de Google</span><br>
       En <code>googleReviewUrl</code> pega tu enlace corto que termina en <code>/review</code> (Google Maps → tu negocio → Compartir / “Pedir reseñas”). Ese enlace abre directo el formulario de estrellas.</li>
-    <li><span class="tag">WhatsApp</span><br>
-      En <code>whatsappNumero</code> escribe el número con código de país, sin <code>+</code> ni espacios: <code>56912345678</code>.</li>
     <li><span class="tag">Comunidad Barrón</span><br>
-      En <code>whatsappComunidad</code> pega la invitación del canal: <code>https://whatsapp.com/channel/XXXXXXXX</code>.</li>
+      En <code>whatsappComunidad</code> pega la invitación del canal: <code>https://whatsapp.com/channel/XXXXXXXX</code>
+      (WhatsApp → tu canal → “Invitar por enlace”).</li>
     <li><span class="tag">Ofertas y sorteos</span><br>
       En <code>ofertas</code> pega el destino real de tus ofertas. Ya <b>no</b> lleva al Instagram. Si no quieres esa tarjeta, pon <code>mostrarOfertas: false</code>.</li>
     <li><span class="tag">ION GROUP</span><br>
@@ -44,6 +46,7 @@
     <li><span class="tag">Logo</span><br>
       Guarda la mascota como <code>assets/img/logo-barron.png</code> (también sirve <code>.jpg</code>, <code>.webp</code> o <code>.svg</code>). Aparece sola en la cabecera, sobre el halo amarillo.</li>
   </ol>
+  <p><span class="ok">✓ Ya configurados:</span> Instagram <code>@barron.cl</code>, TikTok <code>@barroncl</code> y Google Maps con la dirección Arturo Prat #862, Coihueco.</p>
   <p>Mientras falten datos, las tarjetas afectadas muestran el rótulo rojo <b>“config. pendiente”</b> y, al tocarlas, avisan que el enlace se está configurando. Nunca llevan a un lugar equivocado.</p>
   <footer>Desarrollado por <strong class="ion">ION GROUP</strong></footer>
 </body>

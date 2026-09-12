@@ -351,11 +351,11 @@ h1,p{ margin:0; }
 }
 .tile__ico svg{ width:21px; height:21px; }
 /* Íconos oficiales: conservan sus colores de marca */
-.tile__ico--wa{ background:rgba(37,211,102,.14); color:#128C4A; border-color:rgba(37,211,102,.3); }
+/* Comunidad Barrón: lleva el logo de WhatsApp (verde oficial) */
+.tile__ico--wa{ background:rgba(37,211,102,.14); color:#1FA855; border-color:rgba(37,211,102,.32); }
 .tile__ico--ig{ background:rgba(214,41,118,.10); border-color:rgba(214,41,118,.24); }
+.tile__ico--tt{ background:rgba(17,24,39,.05); color:#010101; border-color:rgba(17,24,39,.14); }
 .tile__ico--maps{ background:rgba(234,67,53,.11); border-color:rgba(234,67,53,.26); }
-/* Comunidad Barrón: azul rey (color corporativo) */
-.tile__ico--community{ background:rgba(11,78,162,.10); color:var(--blue); border-color:rgba(11,78,162,.24); }
 
 .tile__title{ font-size:15px; font-weight:900; letter-spacing:.2px; }
 .tile__sub{ margin-top:3px; font-size:12px; line-height:1.35; color:var(--muted); padding-right:16px; }

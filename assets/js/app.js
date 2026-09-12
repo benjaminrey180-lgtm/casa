@@ -16,13 +16,6 @@
 
   function isSet(v) { return typeof v === 'string' && v.trim() !== ''; }
 
-  function normalizarWhatsApp(numero) {
-    var soloDigitos = String(numero).replace(/[^0-9]/g, '');
-    if (!soloDigitos) return '';
-    return 'https://wa.me/' + soloDigitos +
-           (isSet(L.whatsappMensaje) ? '?text=' + encodeURIComponent(L.whatsappMensaje) : '');
-  }
-
   function urlResenaGoogle() {
     // 1º el enlace corto de reseña (abre directo el formulario de estrellas)
     if (isSet(L.googleReviewUrl)) return L.googleReviewUrl.trim();
@@ -76,10 +69,11 @@
   var reviewCard = $('reviewCard');
   if (reviewCard && isSet(reviewUrl)) reviewCard.setAttribute('href', reviewUrl);
 
-  /* 4) Tarjetas principales ------------------------------------------- */
-  aplicar('tileWhatsapp',  normalizarWhatsApp(L.whatsappNumero), true);
-  aplicar('tileInstagram', isSet(L.instagram) ? L.instagram : 'https://www.instagram.com/barron.cl/', true);
+  /* 4) TARJETAS PRINCIPALES -------------------------------------------
+     Comunidad Barrón → canal de WhatsApp · Instagram · TikTok · Maps  */
   aplicar('tileComunidad', L.whatsappComunidad, true);
+  aplicar('tileInstagram', isSet(L.instagram) ? L.instagram : 'https://www.instagram.com/barron.cl/', true);
+  aplicar('tileTiktok',    isSet(L.tiktok) ? L.tiktok : 'https://www.tiktok.com/@barroncl', true);
   aplicar('tileMaps',      L.googleMaps, true);
 
   /* 5) Ofertas y sorteos ----------------------------------------------

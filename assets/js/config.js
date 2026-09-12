@@ -4,11 +4,16 @@
    ESTE ES EL ÚNICO ARCHIVO QUE TIENES QUE EDITAR para cambiar cualquier enlace.
    Se edita con cualquier editor de texto (Bloc de notas incluido) y no rompe nada.
 
+   TARJETAS DE LA PÁGINA: Comunidad Barrón (WhatsApp) · Instagram · TikTok · Maps
+   La tarjeta de WhatsApp directo fue ELIMINADA: ahora el único acceso a
+   WhatsApp es el canal "Comunidad Barrón", con el logo de WhatsApp.
+
    ESTADO ACTUAL (lo que falta completar):
      ⬜ 1. enlaces.googleReviewUrl  ... tu enlace corto de reseña de Google
-     ⬜ 2. enlaces.whatsappNumero   ... número de WhatsApp del supermercado
-     ⬜ 3. enlaces.whatsappComunidad... canal de WhatsApp "Comunidad Barrón"
+     ⬜ 2. enlaces.whatsappComunidad... canal de WhatsApp "Comunidad Barrón"
+     ⬜ 3. enlaces.ofertas          ... destino de la tarjeta Ofertas y sorteos
      ⬜ 4. enlaces.ionGroup         ... contacto de ION GROUP (opcional)
+     ✅ enlaces.instagram, tiktok y googleMaps ya están puestos
 
    Mientras un campo esté vacío (""), la página NO rompe: muestra un aviso
    discreto "config. pendiente" y, al tocar, el mensaje
@@ -50,18 +55,18 @@ window.BARRON_CONFIG = {
     googleReviewUrl: "",  // ⬅ PEGA AQUÍ tu enlace corto  · TODO: REEMPLAZAR
     googlePlaceId:   "",  // opcional: "ChIJ..."         · TODO: REEMPLAZAR
 
-    /* 2) WHATSAPP -----------------------------------------------------------
-       Número del supermercado con código de país, SIN "+", espacios ni guiones.
-       Ejemplo Chile: 56 9 1234 5678  ->  "56912345678"                       */
-    whatsappNumero: "",   // TODO: REEMPLAZAR  ej: "56912345678"
-    whatsappMensaje: "¡Hola, Familia Barrón! Quisiera hacer una consulta.",
+    /* 2) COMUNIDAD BARRÓN (canal oficial de WhatsApp) -----------------------
+       Es el ÚNICO acceso a WhatsApp de la página: la tarjeta de WhatsApp
+       directo se quitó. Enlace de invitación del canal:
+         https://whatsapp.com/channel/XXXXXXXX
+       Se obtiene en WhatsApp → tu canal → "Invitar por enlace".            */
+    whatsappComunidad: "",  // TODO: REEMPLAZAR
 
     /* 3) INSTAGRAM ---------------------------------------------------------- */
     instagram: "https://www.instagram.com/barron.cl/",
 
-    /* 4) COMUNIDAD BARRÓN (canal oficial de WhatsApp) -----------------------
-       Enlace de invitación del canal: https://whatsapp.com/channel/XXXXXXXX   */
-    whatsappComunidad: "",  // TODO: REEMPLAZAR
+    /* 4) TIKTOK ------------------------------------------------------------- */
+    tiktok: "https://www.tiktok.com/@barroncl",
 
     /* 5) GOOGLE MAPS -------------------------------------------------------- */
     googleMaps: "https://www.google.com/maps/search/?api=1&query=Arturo%20Prat%20862%2C%20Coihueco",
