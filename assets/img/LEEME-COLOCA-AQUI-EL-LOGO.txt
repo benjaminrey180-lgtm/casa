@@ -1,0 +1,25 @@
+COLOCA AQUÍ LA MASCOTA OFICIAL DE BARRÓN
+========================================
+
+Nombre EXACTO del archivo que esta página espera:
+
+    logo-barron.png
+
+Recomendaciones (para que cargue rápido en el celular):
+
+  - PNG con FONDO TRANSPARENTE (el original, sin redibujar ni modificar).
+  - Tamaño ideal: 400 x 400 px  (o 512 x 512 px). Peso: menos de 150 KB.
+  - Si el PNG pesa mucho, comprímelo (p. ej. en tinypng.com) manteniendo la
+    transparencia. La página la muestra a 196 px de ancho en el celular.
+
+Al guardar el archivo con ese nombre en esta carpeta, la mascota aparece
+automáticamente en la cabecera. No hay que tocar nada más.
+
+También puedes reemplazar:
+  - favicon.svg        -> ícono de la pestaña del navegador (opcional).
+  - logo-barron.png    -> se usa además como ícono al agregar la página a la
+                          pantalla de inicio del celular y como imagen al
+                          compartir el enlace (og:image).
+
+Mientras el archivo no exista, la página muestra un recuadro discreto
+"LOGO BARRÓN" en su lugar (nunca una mascota distinta).

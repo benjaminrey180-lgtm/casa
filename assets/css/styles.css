@@ -1,0 +1,465 @@
+/* ============================================================================
+   SUPERMERCADO BARRÓN · Hoja de estilos
+   Sistema visual base: ION GROUP  (misma familia que Capital's Barber)
+   Paleta propia de Barrón: ROJO + NARANJA + AMARILLO + BLANCO
+   Mobile first · sin dependencias externas · sin fuentes descargables
+   ============================================================================ */
+
+/* ---------------------------------------------------------------- 1. Tokens */
+:root{
+  /* Marca Barrón */
+  --red:      #E1251B;
+  --red-dark: #B01810;
+  --orange:   #F57C1F;
+  --yellow:   #FFC72C;
+  --white:    #FFFFFF;
+
+  /* Superficies */
+  --bg:        #08090A;
+  --bg-2:      #0D0E10;
+  --surface:   rgba(255,255,255,.045);
+  --surface-2: rgba(255,255,255,.028);
+  --card:      #131316;
+  --line:      rgba(255,255,255,.085);
+  --line-soft: rgba(255,255,255,.055);
+
+  /* Texto */
+  --text:  #FFFFFF;
+  --muted: rgba(255,255,255,.66);
+  --muted-2: rgba(255,255,255,.46);
+
+  /* Degradado de marca */
+  --grad:  linear-gradient(115deg, var(--yellow) 0%, var(--orange) 48%, var(--red) 100%);
+  --grad-soft: linear-gradient(115deg, rgba(255,199,44,.55), rgba(245,124,31,.5) 48%, rgba(225,37,27,.55) 100%);
+
+  /* Formas */
+  --r-lg: 24px;
+  --r-md: 20px;
+  --r-sm: 15px;
+
+  /* Sombras */
+  --shadow:    0 12px 30px -12px rgba(0,0,0,.85);
+  --shadow-lg: 0 18px 44px -14px rgba(0,0,0,.92);
+  --glow-warm: 0 14px 38px -14px rgba(225,37,27,.55);
+
+  /* Movimiento */
+  --ease: cubic-bezier(.22,1,.36,1);
+  --t: .26s var(--ease);
+
+  /* Layout */
+  --shell: 460px;
+  --pad: 16px;
+}
+
+/* ---------------------------------------------------------------- 2. Base */
+*,*::before,*::after{ box-sizing:border-box; }
+
+html{ -webkit-text-size-adjust:100%; }
+
+body{
+  margin:0;
+  min-height:100svh;
+  background:var(--bg);
+  color:var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size:16px;
+  line-height:1.45;
+  letter-spacing:.1px;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeSpeed;
+  overflow-x:hidden;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+
+img{ max-width:100%; height:auto; display:block; }
+a{ color:inherit; text-decoration:none; -webkit-tap-highlight-color:transparent; }
+button{ font:inherit; color:inherit; border:0; background:none; cursor:pointer; }
+h1,p{ margin:0; }
+
+/* Fondo con brillos cálidos (capa fija, no afecta el scroll) */
+.bg{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.bg__glow{ position:absolute; display:block; border-radius:50%; filter:blur(70px); }
+.bg__glow--top{
+  width:340px; height:340px; top:-140px; left:50%; transform:translateX(-50%);
+  background:radial-gradient(circle, rgba(225,37,27,.30), transparent 68%);
+}
+.bg__glow--bottom{
+  width:420px; height:420px; bottom:-210px; left:50%; transform:translateX(-50%);
+  background:radial-gradient(circle, rgba(255,199,44,.16), transparent 70%);
+}
+
+.shell{
+  position:relative; z-index:1;
+  width:100%; max-width:var(--shell);
+  margin:0 auto;
+  padding:calc(26px + env(safe-area-inset-top)) var(--pad) 0;
+}
+
+.skip{ position:absolute; left:-9999px; }
+.skip:focus{ left:12px; top:12px; z-index:99; background:#111; padding:10px 14px; border-radius:10px; }
+
+/* ---------------------------------------------------------------- 3. Animación */
+@keyframes rise{
+  from{ opacity:0; transform:translate3d(0,16px,0) scale(.985); }
+  to  { opacity:1; transform:none; }
+}
+.rise{ animation:rise .5s var(--ease) both; animation-delay:var(--d,0s); }
+
+@keyframes sheen{
+  0%   { transform:translateX(-130%) skewX(-18deg); opacity:0; }
+  22%  { opacity:.5; }
+  60%  { transform:translateX(230%) skewX(-18deg); opacity:0; }
+  100% { transform:translateX(230%) skewX(-18deg); opacity:0; }
+}
+@keyframes pulse{
+  0%,100%{ transform:scale(1); opacity:1; }
+  50%    { transform:scale(1.5); opacity:.35; }
+}
+
+/* ---------------------------------------------------------------- 4. Cabecera */
+.hero{ text-align:center; padding-bottom:6px; }
+
+.hero__logo{
+  position:relative;
+  width:clamp(158px, 46vw, 196px);
+  margin:0 auto 14px;
+  aspect-ratio:1/1;
+  display:grid;
+  place-items:center;
+  animation:rise .65s var(--ease) both;
+}
+/* Aro con degradado amarillo → naranja → rojo detrás de la mascota */
+.hero__ring{
+  position:absolute; inset:2%;
+  border-radius:50%;
+  background:conic-gradient(from 200deg, var(--yellow), var(--orange) 34%, var(--red) 62%, rgba(225,37,27,.05) 82%, var(--yellow));
+  opacity:.16;
+  filter:blur(14px);
+}
+.hero__img{
+  position:relative;
+  width:100%; height:100%;
+  object-fit:contain;
+  filter:drop-shadow(0 12px 26px rgba(0,0,0,.6));
+  animation:rise .7s var(--ease) both;
+}
+/* Reserva visual mientras se carga el PNG de la mascota */
+.hero__slot{
+  position:absolute; inset:8%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+  border:1.5px dashed var(--line);
+  border-radius:var(--r-lg);
+  color:var(--muted-2);
+  background:var(--surface-2);
+}
+.hero__slot[hidden]{ display:none; }
+.hero__slot svg{ width:30px; height:30px; }
+.hero__slot small{ font-size:10.5px; letter-spacing:.16em; font-weight:700; }
+
+.hero__greeting{
+  font-size:clamp(25px, 7.4vw, 30px);
+  font-weight:800;
+  line-height:1.12;
+  letter-spacing:.4px;
+  text-transform:uppercase;
+  background:var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+  filter:drop-shadow(0 6px 18px rgba(225,37,27,.28));
+}
+.hero__name{
+  margin-top:8px;
+  font-size:clamp(16px, 4.5vw, 18px);
+  font-weight:800;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--white);
+}
+.hero__tagline{
+  margin-top:5px;
+  font-size:14.5px;
+  font-weight:600;
+  color:var(--yellow);
+  letter-spacing:.06em;
+}
+.hero__desc{
+  margin:12px auto 0;
+  max-width:34ch;
+  font-size:13.5px;
+  line-height:1.55;
+  color:var(--muted);
+}
+
+/* Pastilla de horario con estado en vivo */
+.hours{
+  display:inline-flex; align-items:center; gap:8px;
+  margin-top:14px; padding:7px 14px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:var(--surface-2);
+  font-size:12.5px; font-weight:600; color:var(--muted);
+}
+.hours__dot{
+  width:7px; height:7px; border-radius:50%;
+  background:var(--muted-2);
+  box-shadow:0 0 0 0 rgba(255,255,255,.3);
+}
+.hours[data-open="true"]{ color:#B9F6CB; border-color:rgba(52,199,89,.35); background:rgba(52,199,89,.09); }
+.hours[data-open="true"] .hours__dot{ background:#34C759; animation:pulse 2.4s ease-in-out infinite; }
+.hours[data-open="false"] .hours__dot{ background:var(--orange); }
+
+/* ---------------------------------------------------------------- 5. Bloques */
+.stack{ display:flex; flex-direction:column; gap:14px; padding-top:22px; }
+.block{ display:flex; flex-direction:column; gap:9px; }
+
+/* Tarjeta base (bordes finos, esquinas redondeadas, sombra suave) */
+.card{
+  position:relative;
+  display:flex; align-items:center; gap:14px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  background:linear-gradient(180deg, var(--surface), var(--surface-2));
+  box-shadow:var(--shadow);
+  transition:transform var(--t), border-color var(--t), box-shadow var(--t), background var(--t);
+  overflow:hidden;
+}
+.card:active{ transform:scale(.978); border-color:rgba(255,199,44,.4); }
+@media (hover:hover){
+  .card:hover{ transform:translateY(-2px); border-color:rgba(255,199,44,.35); box-shadow:var(--shadow-lg); }
+  .card:hover .arrow{ transform:translateX(3px); color:var(--yellow); }
+}
+
+/* Flecha */
+.arrow{
+  flex:0 0 auto;
+  display:grid; place-items:center;
+  width:34px; height:34px; border-radius:50%;
+  color:var(--muted);
+  background:var(--surface);
+  border:1px solid var(--line-soft);
+  transition:transform var(--t), color var(--t), background var(--t);
+}
+.arrow svg{ width:17px; height:17px; }
+.arrow--sm{ width:28px; height:28px; }
+.arrow--sm svg{ width:15px; height:15px; }
+.card:active .arrow{ transform:translateX(2px); }
+
+.hint{
+  font-size:12.5px; line-height:1.5; color:var(--muted-2);
+  padding:0 4px; text-align:center;
+}
+
+/* ---------------------------------------------------------------- 6. Reseña Google */
+.review{
+  padding:17px 16px;
+  border-color:rgba(255,199,44,.28);
+  background:
+    linear-gradient(180deg, rgba(255,199,44,.09), rgba(225,37,27,.05)),
+    linear-gradient(180deg, var(--surface), var(--surface-2));
+  box-shadow:var(--glow-warm);
+}
+/* Detalle con degradado amarillo → naranja → rojo en el borde izquierdo */
+.review::before{
+  content:""; position:absolute; left:0; top:14px; bottom:14px; width:3px;
+  border-radius:0 4px 4px 0;
+  background:var(--grad);
+}
+.review__badge{
+  flex:0 0 auto;
+  display:grid; place-items:center;
+  width:44px; height:44px; border-radius:14px;
+  background:var(--white);
+  box-shadow:0 6px 16px -6px rgba(0,0,0,.8);
+}
+.review__badge svg{ width:24px; height:24px; }
+.review__body{ display:flex; flex-direction:column; gap:3px; min-width:0; flex:1; }
+.review__eyebrow{
+  font-size:10.5px; font-weight:800; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--orange);
+}
+.review__title{ font-size:16px; font-weight:800; letter-spacing:.2px; }
+.review__stars{ display:flex; gap:3px; margin-top:4px; }
+.review__stars svg{ width:15px; height:15px; fill:var(--yellow); filter:drop-shadow(0 2px 6px rgba(255,199,44,.35)); }
+
+/* ---------------------------------------------------------------- 7. Botón compartir */
+.btn{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  width:100%; min-height:58px; padding:14px 18px;
+  border-radius:var(--r-md);
+  font-size:15.5px; font-weight:700; letter-spacing:.2px;
+  transition:transform var(--t), box-shadow var(--t), border-color var(--t);
+}
+.btn:active{ transform:scale(.978); }
+.btn__ico{ display:grid; place-items:center; width:26px; height:26px; border-radius:9px; background:rgba(255,255,255,.12); }
+.btn__ico svg{ width:16px; height:16px; }
+
+.btn--share{
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.03));
+  box-shadow:var(--shadow);
+}
+@media (hover:hover){ .btn--share:hover{ border-color:rgba(255,199,44,.4); } }
+
+/* ---------------------------------------------------------------- 8. Cuadrícula 2 columnas */
+.grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+.tile{
+  flex-direction:column; align-items:flex-start; gap:0;
+  min-height:132px;
+  padding:14px;
+}
+.tile__ico{
+  display:grid; place-items:center;
+  width:42px; height:42px; margin-bottom:11px;
+  border-radius:13px;
+  border:1px solid var(--line-soft);
+}
+.tile__ico svg{ width:21px; height:21px; }
+.tile__ico--wa{ background:rgba(37,211,102,.12); color:#25D366; border-color:rgba(37,211,102,.24); }
+.tile__ico--ig{ background:linear-gradient(135deg, rgba(248,196,44,.16), rgba(225,48,108,.18), rgba(129,52,175,.2)); color:#F06292; border-color:rgba(225,48,108,.26); }
+.tile__ico--community{ background:rgba(0,168,132,.13); color:#3DDC97; border-color:rgba(0,168,132,.26); }
+.tile__ico--maps{ background:rgba(234,67,53,.13); color:#FF6B5B; border-color:rgba(234,67,53,.26); }
+
+.tile__title{ font-size:15px; font-weight:800; letter-spacing:.2px; }
+.tile__sub{ margin-top:3px; font-size:12px; line-height:1.35; color:var(--muted); padding-right:16px; }
+.tile__go{
+  position:absolute; top:13px; right:12px;
+  color:var(--muted-2);
+  transition:transform var(--t), color var(--t);
+}
+.tile__go svg{ width:16px; height:16px; }
+@media (hover:hover){ .tile:hover .tile__go{ color:var(--yellow); transform:translateX(2px); } }
+
+/* ---------------------------------------------------------------- 9. Ofertas y sorteos */
+.offers{
+  padding:17px 16px;
+  border:0;
+  background:linear-gradient(115deg, #FFB800 0%, #F2760F 46%, #D31E14 100%);
+  box-shadow:0 16px 38px -14px rgba(225,37,27,.75);
+  gap:13px;
+}
+.offers__shine{
+  position:absolute; top:-40%; left:0; width:38%; height:180%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  animation:sheen 4.6s var(--ease) 1.4s infinite;
+  pointer-events:none;
+}
+.offers__ico{
+  flex:0 0 auto;
+  display:grid; place-items:center;
+  width:46px; height:46px; border-radius:14px;
+  background:rgba(0,0,0,.22);
+  color:#FFE7A8;
+  border:1px solid rgba(255,255,255,.28);
+}
+.offers__ico svg{ width:23px; height:23px; }
+.offers__body{ display:flex; flex-direction:column; gap:2px; flex:1; min-width:0; }
+.offers__title{
+  font-size:16px; font-weight:900; letter-spacing:.12em; text-transform:uppercase;
+  text-shadow:0 2px 10px rgba(90,20,0,.35);
+}
+.offers__sub{ font-size:12.5px; font-weight:600; color:rgba(255,255,255,.92); }
+.offers .arrow{
+  color:#fff; background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.34);
+}
+@media (hover:hover){ .offers:hover .arrow{ color:#3A1000; background:#fff; } }
+
+/* ---------------------------------------------------------------- 10. Dirección */
+.address{ padding:16px; gap:13px; align-items:center; }
+.address__ico{
+  flex:0 0 auto;
+  display:grid; place-items:center;
+  width:44px; height:44px; border-radius:14px;
+  background:rgba(255,199,44,.1);
+  border:1px solid rgba(255,199,44,.22);
+  color:var(--yellow);
+}
+.address__ico svg{ width:22px; height:22px; }
+.address__body{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
+.address__label{
+  font-size:10.5px; font-weight:800; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--orange);
+}
+.address__value{ font-size:15px; font-weight:800; }
+.address__hours{ font-size:12px; color:var(--muted); }
+
+/* ---------------------------------------------------------------- 11. Gracias */
+.thanks{ text-align:center; padding:26px 8px 4px; }
+.thanks__title{
+  font-size:19px; font-weight:800; letter-spacing:.3px;
+  background:var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+.thanks__sub{ margin-top:6px; font-size:13px; color:var(--muted); }
+
+/* ---------------------------------------------------------------- 12. Footer */
+.footer{ padding:26px 0 calc(30px + env(safe-area-inset-bottom)); text-align:center; }
+.footer__link{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:9px 15px;
+  border-radius:999px;
+  border:1px solid var(--line-soft);
+  background:var(--surface-2);
+  font-size:11.5px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted-2);
+  transition:color var(--t), border-color var(--t);
+}
+.footer__link strong{ color:var(--muted); font-weight:800; letter-spacing:.12em; }
+.footer__link:active{ transform:scale(.98); }
+@media (hover:hover){ .footer__link:hover{ color:var(--muted); border-color:rgba(255,199,44,.35); } }
+.footer__dot{
+  width:7px; height:7px; border-radius:2px;
+  background:var(--grad);
+}
+
+/* ---------------------------------------------------------------- 13. Aviso (toast) */
+.toast{
+  position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom));
+  z-index:50;
+  width:max-content; max-width:min(92vw, 420px);
+  padding:12px 17px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(20,20,22,.96);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  box-shadow:var(--shadow-lg);
+  font-size:13px; font-weight:600; text-align:center; color:var(--text);
+  opacity:0; transform:translate(-50%, 14px); pointer-events:none;
+  transition:opacity .28s var(--ease), transform .28s var(--ease);
+}
+.toast.is-visible{ opacity:1; transform:translate(-50%, 0); }
+
+/* Enlaces pendientes de configurar (aviso visual discreto) */
+.is-pending{ opacity:.72; }
+.is-pending .tile__sub::after,
+.is-pending .review__eyebrow::after{ content:" · config. pendiente"; color:var(--orange); font-weight:700; }
+
+/* Tarjetas ocultas por configuración */
+.is-hidden{ display:none !important; }
+
+/* ---------------------------------------------------------------- 14. Accesibilidad */
+:focus-visible{
+  outline:2px solid var(--yellow);
+  outline-offset:3px;
+  border-radius:var(--r-sm);
+}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+  .rise{ animation:none; opacity:1; transform:none; }
+  .card:active, .btn:active{ transform:none; }
+}
+
+/* ---------------------------------------------------------------- 15. Pantallas grandes */
+@media (min-width:520px){
+  :root{ --pad:20px; }
+  .shell{ padding-top:38px; }
+  .tile{ min-height:142px; padding:16px; }
+  .stack{ gap:15px; padding-top:26px; }
+}
