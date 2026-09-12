@@ -2,7 +2,9 @@
 
 Página móvil para tarjeta **NFC / código QR** de Supermercado Barrón (Arturo Prat #862, Coihueco).
 Misma estructura y lenguaje visual del sistema **ION GROUP** (familia *Capital's Barber*),
-con la identidad propia de Barrón: **rojo + naranja + amarillo + blanco** y la mascota oficial.
+con la identidad propia de Barrón: **fondo blanco** y la paleta corporativa
+**rojo rey `#C8102E` + amarillo rey `#FFC72C` + azul rey `#0B4EA2` + blanco**,
+más el degradado amarillo → naranja → rojo en detalles y bordes.
 
 ```
 casa/
@@ -41,7 +43,7 @@ Abre **`assets/js/config.js`** y completa solo las líneas marcadas con `// TODO
 | `enlaces.ionGroup` | Instagram / WhatsApp / web de ION GROUP | ⬜ pendiente |
 | `enlaces.instagram` | `https://www.instagram.com/barron.cl/` | ✅ ya puesto |
 | `enlaces.googleMaps` | Búsqueda de la dirección en Maps | ✅ ya puesto |
-| `enlaces.ofertas` | Si queda vacío, usa el Instagram | ⚙️ usa Instagram |
+| `enlaces.ofertas` | Destino real de las ofertas (ya **no** usa Instagram). Si no quieres la tarjeta: `mostrarOfertas: false` | ⬜ pendiente |
 
 > Sin datos reales no se inventó ninguna URL: los botones que aún no tienen enlace
 > muestran el aviso *"Este enlace se está configurando"* en vez de llevar a un lugar equivocado.

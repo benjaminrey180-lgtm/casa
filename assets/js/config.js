@@ -67,9 +67,15 @@ window.BARRON_CONFIG = {
     googleMaps: "https://www.google.com/maps/search/?api=1&query=Arturo%20Prat%20862%2C%20Coihueco",
 
     /* 6) OFERTAS Y SORTEOS --------------------------------------------------
-       Déjalo vacío ("") para que use el Instagram automáticamente.
-       O pega aquí el enlace del canal de WhatsApp / sección de ofertas.    */
-    ofertas: "",   // vacío = usa Instagram
+       Esta tarjeta YA NO lleva al Instagram. Pega aquí el destino real de las
+       ofertas (canal de WhatsApp, publicación fijada, carpeta de Drive, PDF,
+       página de ofertas, etc.). Mientras esté vacío ("") la tarjeta queda
+       marcada como "config. pendiente" y no lleva a ningún lugar equivocado.
+
+       Si prefieres que la tarjeta NO aparezca en la página, deja
+       mostrarOfertas en false.                                            */
+    ofertas: "",            // TODO: REEMPLAZAR con el destino real de ofertas
+    mostrarOfertas: true,   // false = quita la tarjeta "Ofertas y sorteos"
 
     /* 7) ION GROUP (desarrollador) ------------------------------------------
        Instagram, WhatsApp o sitio web de ION GROUP.                        */

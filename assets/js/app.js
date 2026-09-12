@@ -82,8 +82,16 @@
   aplicar('tileComunidad', L.whatsappComunidad, true);
   aplicar('tileMaps',      L.googleMaps, true);
 
-  /* 5) Ofertas y sorteos ---------------------------------------------- */
-  aplicar('offersCard', isSet(L.ofertas) ? L.ofertas : L.instagram, true);
+  /* 5) Ofertas y sorteos ----------------------------------------------
+     Ya NO apunta a Instagram. Solo se activa cuando hay un destino real
+     (página de ofertas, canal de WhatsApp, etc.).
+     Para quitar la tarjeta del todo: mostrarOfertas: false en config.js  */
+  if (L.mostrarOfertas === false) {
+    var offersBlock = $('offersBlock');
+    if (offersBlock) offersBlock.classList.add('is-hidden');
+  } else {
+    aplicar('offersCard', L.ofertas, true);
+  }
 
   /* 6) Dirección ------------------------------------------------------ */
   var addressCard = $('addressCard');
