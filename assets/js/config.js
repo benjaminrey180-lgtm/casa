@@ -2,10 +2,17 @@
    SUPERMERCADO BARRÓN · CONFIGURACIÓN CENTRAL DE ENLACES
    ----------------------------------------------------------------------------
    ESTE ES EL ÚNICO ARCHIVO QUE TIENES QUE EDITAR para cambiar cualquier enlace.
+   Se edita con cualquier editor de texto (Bloc de notas incluido) y no rompe nada.
 
-   Los campos marcados con  // TODO: REEMPLAZAR  todavía no tienen el dato real.
-   Mientras estén vacíos (""), la página NO rompe: muestra un aviso discreto
-   ("enlace en configuración") cuando el cliente toca esas tarjetas.
+   ESTADO ACTUAL (lo que falta completar):
+     ⬜ 1. enlaces.googleReviewUrl  ... tu enlace corto de reseña de Google
+     ⬜ 2. enlaces.whatsappNumero   ... número de WhatsApp del supermercado
+     ⬜ 3. enlaces.whatsappComunidad... canal de WhatsApp "Comunidad Barrón"
+     ⬜ 4. enlaces.ionGroup         ... contacto de ION GROUP (opcional)
+
+   Mientras un campo esté vacío (""), la página NO rompe: muestra un aviso
+   discreto "config. pendiente" y, al tocar, el mensaje
+   "Este enlace se está configurando. ¡Pronto estará disponible!".
    ============================================================================ */
 
 window.BARRON_CONFIG = {
@@ -26,17 +33,22 @@ window.BARRON_CONFIG = {
   enlaces: {
 
     /* 1) RESEÑA EN GOOGLE ----------------------------------------------------
-       Lo ideal es el "Place ID" de la ficha de Supermercado Barrón en Google:
-       la tarjeta abrirá DIRECTAMENTE el formulario de estrellas.
-       Cómo obtenerlo: https://developers.google.com/maps/documentation/places/web-service/place-id
-       (buscador: "Place ID Finder" de Google).
-       Inicio del ID: suele empezar con "ChIJ..."                            */
-    googlePlaceId: "",   // TODO: REEMPLAZAR  ej: "ChIJxxxxxxxxxxxxxxxxxxx"
+       ← PEGA AQUÍ TU ENLACE CORTO DE RESEÑA. Acepta dos formatos:
 
-    /* Opcional: si ya tienes el enlace corto de reseña de Google
-       (ej: https://g.page/r/XXXXXXXX/review), pégalo aquí.
-       Tiene prioridad si googlePlaceId está vacío.                        */
-    googleReviewUrl: "",  // TODO: REEMPLAZAR (opcional)
+       a) Enlace corto (el más simple):
+          https://g.page/r/XXXXXXXXXXXXXXXX/review
+          o  https://search.google.com/local/reviews?placeid=ChIJ...
+
+          Dónde conseguirlo: Google Maps → busca "Supermercado Barrón Coihueco"
+          → botón Compartir / "Pedir reseñas" (si administras la ficha) → copiar.
+          OJO: usa el enlace que termina en /review (ese abre el formulario
+          de estrellas). Un enlace normal de Maps solo muestra la ficha.
+
+       b) Place ID (opcional, más técnico): si lo tienes, la página arma sola
+          el enlace que abre DIRECTAMENTE el formulario de estrellas.
+          Se obtiene en el "Place ID Finder" de Google. Empieza con "ChIJ".   */
+    googleReviewUrl: "",  // ⬅ PEGA AQUÍ tu enlace corto  · TODO: REEMPLAZAR
+    googlePlaceId:   "",  // opcional: "ChIJ..."         · TODO: REEMPLAZAR
 
     /* 2) WHATSAPP -----------------------------------------------------------
        Número del supermercado con código de país, SIN "+", espacios ni guiones.

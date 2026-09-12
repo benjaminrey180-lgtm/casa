@@ -1,25 +1,33 @@
 COLOCA AQUÍ LA MASCOTA OFICIAL DE BARRÓN
 ========================================
 
-Nombre EXACTO del archivo que esta página espera:
+Nombre recomendado del archivo (uno de estos):
 
-    logo-barron.png
+    logo-barron.png      ← preferido (PNG transparente original)
+    logo-barron.jpg
+    logo-barron.jpeg
+    logo-barron.webp
+    logo-barron.svg
+
+La página prueba esos formatos en ese orden: guarda el archivo con ese nombre
+en esta carpeta y la mascota aparece sola en la cabecera. No hay que tocar
+ninguna otra línea de código.
 
 Recomendaciones (para que cargue rápido en el celular):
 
-  - PNG con FONDO TRANSPARENTE (el original, sin redibujar ni modificar).
-  - Tamaño ideal: 400 x 400 px  (o 512 x 512 px). Peso: menos de 150 KB.
-  - Si el PNG pesa mucho, comprímelo (p. ej. en tinypng.com) manteniendo la
-    transparencia. La página la muestra a 196 px de ancho en el celular.
+  - FONDO TRANSPARENTE (el original, sin redibujar ni modificar).
+  - Tamaño ideal: 400 x 400 px (o 512 x 512 px). Peso: menos de 150 KB.
+  - Si pesa mucho, comprímelo manteniendo la transparencia
+    (p. ej. tinypng.com o squoosh.app). Se muestra a 196 px de ancho.
 
-Al guardar el archivo con ese nombre en esta carpeta, la mascota aparece
-automáticamente en la cabecera. No hay que tocar nada más.
+También se usa este mismo archivo como:
+  - ícono al "Agregar a pantalla de inicio" del celular (manifest),
+  - imagen de vista previa al compartir el enlace por WhatsApp.
 
-También puedes reemplazar:
-  - favicon.svg        -> ícono de la pestaña del navegador (opcional).
-  - logo-barron.png    -> se usa además como ícono al agregar la página a la
-                          pantalla de inicio del celular y como imagen al
-                          compartir el enlace (og:image).
+Opcional: si quieres que la pestaña del navegador muestre la mascota en vez
+del recuadro con la "B", reemplaza también el archivo  favicon.svg  de esta
+carpeta por uno llamado  favicon.png  y actualiza la línea <link rel="icon">
+en index.html (una sola línea).
 
 Mientras el archivo no exista, la página muestra un recuadro discreto
-"LOGO BARRÓN" en su lugar (nunca una mascota distinta).
+"LOGO BARRÓN" en su lugar. Nunca se genera ni se dibuja otra mascota.

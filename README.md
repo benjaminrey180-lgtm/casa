@@ -22,7 +22,8 @@ casa/
 
 ## 1. Colocar la mascota
 
-Guarda el PNG **original con fondo transparente** como `assets/img/logo-barron.png`.
+Guarda el PNG **original con fondo transparente** en `assets/img/` con el nombre
+`logo-barron.png` (también acepta `logo-barron.jpg`, `.jpeg`, `.webp` o `.svg`).
 Aparece sola en la cabecera (recomendado: 400×400 px, < 150 KB).
 No está redibujada ni reemplazada por otra mascota: mientras falte el archivo,
 se muestra un recuadro discreto "LOGO BARRÓN".
@@ -33,18 +34,20 @@ Abre **`assets/js/config.js`** y completa solo las líneas marcadas con `// TODO
 
 | Campo | Qué poner | Estado |
 |---|---|---|
-| `enlaces.googlePlaceId` | Place ID de Google (`ChIJ...`) → abre directo el formulario de estrellas | ⬜ pendiente |
-| `enlaces.googleReviewUrl` | Alternativa: enlace corto de reseña (`https://g.page/r/.../review`) | ⬜ pendiente |
+| `enlaces.googleReviewUrl` | **Tu enlace corto de reseña**: `https://g.page/r/XXXX/review` (el que termina en `/review` abre directo el formulario de estrellas) | ⬜ pendiente |
+| `enlaces.googlePlaceId` | Alternativa (`ChIJ...`) — arma sola el enlace directo a estrellas | ⬜ opcional |
 | `enlaces.whatsappNumero` | Número con código de país, sin `+` ni espacios (ej. `56912345678`) | ⬜ pendiente |
-| `enlaces.instagram` | `https://www.instagram.com/barron.cl/` | ✅ ya puesto |
 | `enlaces.whatsappComunidad` | Invitación del canal (`https://whatsapp.com/channel/...`) | ⬜ pendiente |
+| `enlaces.ionGroup` | Instagram / WhatsApp / web de ION GROUP | ⬜ pendiente |
+| `enlaces.instagram` | `https://www.instagram.com/barron.cl/` | ✅ ya puesto |
 | `enlaces.googleMaps` | Búsqueda de la dirección en Maps | ✅ ya puesto |
 | `enlaces.ofertas` | Si queda vacío, usa el Instagram | ⚙️ usa Instagram |
-| `enlaces.ionGroup` | Instagram / WhatsApp / web de ION GROUP | ⬜ pendiente |
 
 > Sin datos reales no se inventó ninguna URL: los botones que aún no tienen enlace
 > muestran el aviso *"Este enlace se está configurando"* en vez de llevar a un lugar equivocado.
 > Si prefieres ocultarlos hasta tenerlos, pon `ocultarEnlacesPendientes: true`.
+> Mientras falten datos, esas tarjetas muestran el rótulo naranjo **"config. pendiente"**
+> para que sepas de un vistazo qué falta antes de imprimir las tarjetas NFC.
 
 ## 3. Publicar
 

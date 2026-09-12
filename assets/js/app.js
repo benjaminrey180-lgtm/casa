@@ -24,12 +24,13 @@
   }
 
   function urlResenaGoogle() {
+    // 1º el enlace corto de reseña (abre directo el formulario de estrellas)
+    if (isSet(L.googleReviewUrl)) return L.googleReviewUrl.trim();
+    // 2º el Place ID, si lo prefieres
     if (isSet(L.googlePlaceId)) {
-      // Abre DIRECTAMENTE el formulario de estrellas de la ficha de Google
       return 'https://search.google.com/local/writereview?placeid=' +
              encodeURIComponent(L.googlePlaceId.trim());
     }
-    if (isSet(L.googleReviewUrl)) return L.googleReviewUrl.trim();
     return ''; // sin configurar -> se usa el respaldo del HTML (búsqueda en Maps)
   }
 
@@ -155,14 +156,39 @@
     }
   })();
 
-  /* Reserva visual si el PNG de la mascota aún no está cargado ------------ */
+  /* Mascota: acepta .png, .jpg, .jpeg, .webp o .svg con el mismo nombre ---- */
   (function logo() {
-    var img = $('brandLogo');
+    var img  = $('brandLogo');
     var slot = $('logoSlot');
     if (!img || !slot) return;
+
+    var candidatos = [
+      'assets/img/logo-barron.png',
+      'assets/img/logo-barron.jpg',
+      'assets/img/logo-barron.jpeg',
+      'assets/img/logo-barron.webp',
+      'assets/img/logo-barron.svg'
+    ];
+    var intento = 0;
+
+    // Arranca desde el archivo que ya viene en el HTML
+    var actual = img.getAttribute('src');
+    var pos = candidatos.indexOf(actual);
+    if (pos > -1) intento = pos;
+
     img.addEventListener('error', function () {
-      img.hidden = true;
+      intento++;
+      if (intento < candidatos.length) {
+        img.setAttribute('src', candidatos[intento]); // prueba el siguiente formato
+        return;
+      }
+      img.hidden = true;      // sin logo: se muestra la reserva, nunca otra mascota
       slot.hidden = false;
+    });
+
+    img.addEventListener('load', function () {
+      img.hidden = false;
+      slot.hidden = true;
     });
   })();
 
