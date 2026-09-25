@@ -13,6 +13,7 @@ const {version}=JSON.parse(await readFile(new URL('./package.json',import.meta.u
 // REVISION lo escribe deploy/deploy.sh con el commit desplegado; el health check lo compara.
 const revision=(await readFile(new URL('./REVISION',import.meta.url),'utf8').catch(()=>'')).trim()||'dev';
 import {allowedOrigin,allowedHost,securityHeaders} from './security.mjs';
+import {listClients,saveClient,checkClients,search,CATEGORIES,STATUSES,MODULES} from './clients.mjs';
 import {handlePublic as handleNFC,listTags,saveTag,setActive,qrSVG,ACTION_KINDS} from './nfc.mjs';
 // Dominio público donde viven las placas (iongroup.cl/nfc/[código]).
 const nfcBase=(process.env.NFC_PUBLIC_BASE||'https://iongroup.cl').replace(/\/$/,'');
@@ -28,7 +29,7 @@ if (sectorCount === 0) {
 const integrations=await createIntegrations();
 const manager=await createManager();
 const calendar=await createCalendar();
-const staticFiles=['/','/nfc.html','/login.html','/login.js','/auth.js','/app.js','/style.css','/channels.js','/manager.js','/calendar.js','/nfc.js','/manifest.webmanifest','/assets/ion-group-logo.jpeg','/assets/ion-group-logo-480.webp','/assets/ion-group-logo-960.webp','/assets/icon-192.png','/assets/icon-512.png','/assets/apple-touch-icon.png'];
+const staticFiles=['/','/nfc.html','/login.html','/login.js','/auth.js','/app.js','/style.css','/channels.js','/manager.js','/calendar.js','/nfc.js','/clients.js','/manifest.webmanifest','/assets/ion-group-logo.jpeg','/assets/ion-group-logo-480.webp','/assets/ion-group-logo-960.webp','/assets/icon-192.png','/assets/icon-512.png','/assets/apple-touch-icon.png'];
 const mime={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',jpeg:'image/jpeg',webp:'image/webp',png:'image/png',webmanifest:'application/manifest+json'};
 async function readJSON(req){const raw=await rawBody(req);try{return JSON.parse(raw);}catch{throw Object.assign(Error('Solicitud inválida'),{status:400});}}
 const server=http.createServer(async(req,res)=>{
@@ -61,6 +62,10 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==='POST'&&['/api/calendar','/api/calendar/status'].includes(req.url)){let input;input=await readJSON(req);return json(200,await(req.url.endsWith('/status')?calendar.toggle(input):calendar.save(input)));}
   if(req.method==='GET'&&req.url==='/api/manager')return json(200,await manager.state());
   if(req.method==='POST'&&req.url==='/api/manager'){let input;input=await readJSON(req);const {rows: sRows} = await pool.query('SELECT * FROM sectors');return json(202,await manager.submit(input?.text,input?.requestId,sRows));}
+  if(req.method==='GET'&&url.pathname==='/api/clients')return json(200,{clients:await listClients(),categories:CATEGORIES,statuses:STATUSES,modules:MODULES});
+  if(req.method==='POST'&&url.pathname==='/api/clients'){const input=await readJSON(req);return json(200,await saveClient(input||{}));}
+  if(req.method==='POST'&&url.pathname==='/api/clients/check')return json(200,await checkClients());
+  if(req.method==='GET'&&url.pathname==='/api/search'){const q=(url.searchParams.get('q')||'').slice(0,80);return json(200,{results:await search(q)});}
   if(req.method==='GET'&&url.pathname==='/api/nfc')return json(200,{tags:await listTags(),kinds:ACTION_KINDS,publicBase:nfcBase});
   if(req.method==='POST'&&url.pathname==='/api/nfc'){const input=await readJSON(req);return json(200,await saveTag(input||{}));}
   if(req.method==='POST'&&url.pathname==='/api/nfc/status'){const input=await readJSON(req);return json(200,await setActive(input?.code,input?.active));}
@@ -105,4 +110,6 @@ const server=http.createServer(async(req,res)=>{
   json(404,{error:'No encontrado'});
  }catch(e){console.error(e.message);if(!res.headersSent)json(e.status||500,{error:e.status?e.message:'No se pudo completar la operación'});else res.end();}
 });
+// Monitoreo de sistemas de clientes cada 10 minutos (MONITOR_CLIENTS=off lo desactiva).
+if(process.env.MONITOR_CLIENTS!=='off'){const run=()=>checkClients().catch(e=>console.error('Monitoreo:',e.message));setTimeout(run,30000).unref();setInterval(run,600000).unref();}
 server.listen(Number(process.env.PORT||4310),'127.0.0.1',()=>console.log(`ION: http://127.0.0.1:${server.address().port}`));
