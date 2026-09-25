@@ -15,7 +15,7 @@ export function validateEvent(input){
  let start;try{start=chileTime(input.local);}catch(e){throw Object.assign(e,{status:400});}
  return {title:input.title.trim(),client:input.client.trim(),notes:input.notes.trim(),kind:input.kind,local:input.local,start,reminder:input.reminder};
 }
-const escaped=text=>String(text).replace(/\\/g,'\\\\').replace(/\r?\n/g,'\\n').replace(/;/g,'\\;').replace(/,/g,'\\,');
+const escaped=text=>String(text).replace(/\\/g,'\\\\').replace(/\r\n|\r|\n/g,'\\n').replace(/;/g,'\\;').replace(/,/g,'\\,');
 export function eventICS(event){
  const timestamp=value=>new Date(value).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
  const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//ION Group//Agenda//ES','CALSCALE:GREGORIAN','BEGIN:VEVENT',`UID:${event.id}@ion-group.local`,`DTSTAMP:${timestamp(event.createdAt)}`,`DTSTART:${timestamp(event.start)}`,`DTEND:${timestamp(Date.parse(event.start)+3600000)}`,`SUMMARY:${escaped(event.title)}`,`DESCRIPTION:${escaped([event.kind,event.client,event.notes].filter(Boolean).join('\n'))}`];

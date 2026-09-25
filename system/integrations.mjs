@@ -1,4 +1,6 @@
-import {createHmac,timingSafeEqual,createPublicKey,verify,randomUUID} from 'node:crypto';
+import {createHmac,createHash,timingSafeEqual,createPublicKey,verify,randomUUID} from 'node:crypto';
+// Comparación en tiempo constante (sobre hashes para igualar longitudes).
+const sameSecret=(a,b)=>timingSafeEqual(createHash('sha256').update(String(a??'')).digest(),createHash('sha256').update(String(b??'')).digest());
 import {readFile,writeFile,rename,mkdir} from 'node:fs/promises';
 export function metaSignature(raw, signature, secret) {
  if(!secret||!/^sha256=[a-f0-9]{64}$/i.test(signature||''))return false;
@@ -14,8 +16,10 @@ export async function createIntegrations({env=process.env,fetcher=fetch}={}) {
  const required={facebook:['META_APP_SECRET','META_VERIFY_TOKEN','META_API_VERSION','FACEBOOK_PAGE_TOKEN','FACEBOOK_PAGE_ID'],whatsapp:['META_APP_SECRET','META_VERIFY_TOKEN','META_API_VERSION','WHATSAPP_ACCESS_TOKEN','WHATSAPP_PHONE_NUMBER_ID'],instagram:['META_APP_SECRET','META_VERIFY_TOKEN','META_API_VERSION','INSTAGRAM_ACCESS_TOKEN','INSTAGRAM_ACCOUNT_ID'],discord:['DISCORD_PUBLIC_KEY','DISCORD_GUILD_ID','DISCORD_ALLOWED_USER_IDS']};
  
  const status=async()=>{
-  const {rows} = await pool.query('SELECT * FROM inbox ORDER BY timestamp DESC');
-  return Object.fromEntries(Object.entries(required).map(([channel,keys])=>[channel,{configured:keys.every(k=>Boolean(env[k]?.trim())),missing:keys.filter(k=>!env[k]?.trim()),lastReceived:rows.filter(m=>m.channel===channel&&m.direction==='in')[0]?.received_at||null}]));
+  // Solo el último mensaje recibido por canal, sin leer toda la bandeja.
+  const {rows} = await pool.query("SELECT DISTINCT ON (channel) channel, received_at FROM inbox WHERE direction='in' ORDER BY channel, timestamp DESC");
+  const last=Object.fromEntries(rows.map(r=>[r.channel,r.received_at]));
+  return Object.fromEntries(Object.entries(required).map(([channel,keys])=>[channel,{configured:keys.every(k=>Boolean(env[k]?.trim())),missing:keys.filter(k=>!env[k]?.trim()),lastReceived:last[channel]||null}]));
  };
  
  async function receive(incoming){
@@ -28,7 +32,7 @@ export async function createIntegrations({env=process.env,fetcher=fetch}={}) {
   if(url.pathname==='/webhooks/meta'){
    if(req.method==='GET'){
     if(!env.META_VERIFY_TOKEN)return send(503,{error:'Meta no configurado'});
-    if(url.searchParams.get('hub.mode')!=='subscribe'||url.searchParams.get('hub.verify_token')!==env.META_VERIFY_TOKEN)return send(403,{error:'Verificación inválida'});
+    if(url.searchParams.get('hub.mode')!=='subscribe'||!sameSecret(url.searchParams.get('hub.verify_token'),env.META_VERIFY_TOKEN))return send(403,{error:'Verificación inválida'});
     res.writeHead(200,{'Content-Type':'text/plain'});res.end(url.searchParams.get('hub.challenge')||'');return true;
    }
    if(req.method!=='POST')return send(405,{error:'Método no permitido'});
@@ -90,5 +94,5 @@ export async function createIntegrations({env=process.env,fetcher=fetch}={}) {
   await pool.query('UPDATE inbox SET status=$1, provider_id=$2 WHERE id=$3', ['accepted', result.messages?.[0]?.id||result.message_id, key]);
   return {ok:true,status:'accepted'};
  }
- return {status,webhook,reply,inbox:async()=>{const {rows} = await pool.query('SELECT * FROM inbox ORDER BY timestamp DESC'); return rows;}};
+ return {status,webhook,reply,inbox:async()=>{const {rows} = await pool.query('SELECT * FROM inbox ORDER BY timestamp DESC LIMIT 500'); return rows;}};
 }

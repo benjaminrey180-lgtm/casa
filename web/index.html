@@ -5,6 +5,69 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ION Group SpA — Sistemas y desarrollo de software a medida</title>
 <meta name="description" content="ION Group SpA desarrolla sistemas y software a medida para pymes en Chile. Digitalizamos tu negocio: ventas, caja, reservas, administración y más.">
+<link rel="canonical" href="https://iongroup.cl/">
+<meta name="theme-color" content="#0b0b0c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ION GROUP SpA">
+<meta property="og:locale" content="es_CL">
+<meta property="og:url" content="https://iongroup.cl/">
+<meta property="og:title" content="ION Group SpA — Sistemas y desarrollo de software a medida">
+<meta property="og:description" content="ION Group SpA desarrolla sistemas y software a medida para pymes en Chile. Digitalizamos tu negocio: ventas, caja, reservas, administración y más.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ION Group SpA — Sistemas y desarrollo de software a medida">
+<meta name="twitter:description" content="ION Group SpA desarrolla sistemas y software a medida para pymes en Chile. Digitalizamos tu negocio: ventas, caja, reservas, administración y más.">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://iongroup.cl/#org",
+   "name": "ION GROUP SpA",
+   "alternateName": "ION Group",
+   "url": "https://iongroup.cl/",
+   "email": "iongroupspa@gmail.com",
+   "telephone": "+56921745933",
+   "sameAs": [
+    "https://www.instagram.com/iongroup.cl/"
+   ],
+   "areaServed": {
+    "@type": "Country",
+    "name": "Chile"
+   },
+   "description": "Sistemas y desarrollo de software a medida para pequeñas y medianas empresas.",
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+56921745933",
+    "email": "iongroupspa@gmail.com",
+    "contactType": "sales",
+    "areaServed": "CL",
+    "availableLanguage": "es"
+   }
+  },
+  {
+   "@type": "WebSite",
+   "@id": "https://iongroup.cl/#web",
+   "url": "https://iongroup.cl/",
+   "name": "ION GROUP SpA",
+   "inLanguage": "es-CL",
+   "publisher": {
+    "@id": "https://iongroup.cl/#org"
+   }
+  },
+  {
+   "@type": "Service",
+   "name": "Desarrollo de software a medida",
+   "serviceType": "Desarrollo de software",
+   "provider": {
+    "@id": "https://iongroup.cl/#org"
+   },
+   "areaServed": "CL",
+   "description": "Sistemas administrativos, ingresos y egresos, reservas y aplicaciones web a medida para pymes."
+  }
+ ]
+}
+</script>
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -28,7 +91,7 @@
       <a href="#clientes">Clientes</a>
       <a href="#contacto" class="nav-cta">Contáctanos</a>
     </nav>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Menú"><span></span><span></span><span></span></button>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menú" aria-controls="nav"><span></span><span></span><span></span></button>
   </div>
 </header>
 
@@ -46,9 +109,9 @@
         <a href="#servicios" class="btn btn-ghost-light">Ver servicios</a>
       </div>
       <div class="hero-stats rise d5">
-        <div class="hstat"><b><span class="count" data-to="19">0</span>+</b><span>tipos de sistemas</span></div>
-        <div class="hstat"><b><span class="count" data-to="24">0</span>/7</b><span>soporte técnico</span></div>
-        <div class="hstat"><b><span class="count" data-to="100">0</span>%</b><span>a tu medida</span></div>
+        <div class="hstat"><b><span class="count" data-to="19">19</span>+</b><span>tipos de sistemas</span></div>
+        <div class="hstat"><b><span class="count" data-to="24">24</span>/7</b><span>soporte técnico</span></div>
+        <div class="hstat"><b><span class="count" data-to="100">100</span>%</b><span>a tu medida</span></div>
       </div>
     </div>
     <div class="hero-visual rise d3">
@@ -242,9 +305,9 @@
     </div>
     <div class="contact-card reveal">
       <form class="contact-form" id="contact-form" novalidate>
-        <div class="f-row"><div class="f-field"><label>Tu nombre</label><input type="text" name="nombre" placeholder="Ej: Rodrigo Muñoz" required></div><div class="f-field"><label>Tu negocio</label><input type="text" name="negocio" placeholder="Ej: Barbería Vega" required></div></div>
-        <div class="f-row"><div class="f-field"><label>Teléfono / WhatsApp</label><input type="tel" name="tel" placeholder="+56 9 ..."></div><div class="f-field"><label>Correo</label><input type="email" name="correo" placeholder="tu@correo.cl" required></div></div>
-        <div class="f-field"><label>¿Qué necesitas?</label><textarea name="msg" rows="3" placeholder="Ej: sistema de ventas, caja y reservas para mi local de barbería..." required></textarea></div>
+        <div class="f-row"><div class="f-field"><label for="f-nombre">Tu nombre</label><input id="f-nombre" autocomplete="name" type="text" name="nombre" placeholder="Ej: Rodrigo Muñoz" required></div><div class="f-field"><label for="f-negocio">Tu negocio</label><input id="f-negocio" autocomplete="organization" type="text" name="negocio" placeholder="Ej: Barbería Vega" required></div></div>
+        <div class="f-row"><div class="f-field"><label for="f-tel">Teléfono / WhatsApp</label><input id="f-tel" autocomplete="tel" inputmode="tel" type="tel" name="tel" placeholder="+56 9 ..."></div><div class="f-field"><label for="f-correo">Correo</label><input id="f-correo" autocomplete="email" type="email" name="correo" placeholder="tu@correo.cl" required></div></div>
+        <div class="f-field"><label for="f-msg">¿Qué necesitas?</label><textarea id="f-msg" name="msg" rows="3" placeholder="Ej: sistema de ventas, caja y reservas para mi local de barbería..." required></textarea></div>
         <button type="submit" class="btn btn-dark btn-send">Cotizar ahora <span class="arr">→</span></button>
         <p class="small muted form-note">Se abrirá tu correo dirigido a ION Group. Sin compromiso.</p>
       </form>
@@ -265,7 +328,7 @@
   <div class="container footer-inner">
     <div class="footer-brand">
       <a href="https://www.instagram.com/iongroup.cl/" target="_blank" rel="noopener" aria-label="Instagram de ION Group">
-        <img src="img/logo2-white.png" alt="ION Group" class="footer-logo">
+        <img src="img/logo2-white.png" alt="" class="footer-logo" loading="lazy" decoding="async">
       </a>
       <p class="small">Sistemas y desarrollo de software a medida para pequeñas y medianas empresas.</p>
       <a class="back-top" href="#inicio">↑ Volver arriba</a>
@@ -284,11 +347,11 @@
     </div>
   </div>
   <div class="container footer-bottom">
-    <span>© <span id="year"></span> ION GROUP SpA. Todos los derechos reservados.</span>
+    <span>© <span id="year">2026</span> ION GROUP SpA. Todos los derechos reservados.</span>
     <span class="credit">Sitio desarrollado por ION Group</span>
   </div>
 </footer>
 
-<script src="js/main.js"></script>
+<script src="js/main.js" defer></script>
 </body>
 </html>

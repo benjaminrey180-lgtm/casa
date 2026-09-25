@@ -18,3 +18,7 @@ test('Guardar, editar, completar y exportar sin perder persistencia',async()=>{
  await assert.rejects(calendar.save({...input,id:'no-existe'}),/no encontrado/);
  await assert.rejects(calendar.toggle({id:'no-existe',done:true}),/no encontrado/);
 });
+test('El .ics no permite inyectar líneas con retornos de carro',()=>{
+ const ics=eventICS({id:'x',createdAt:'2026-09-01T00:00:00Z',start:'2026-09-22T13:00:00.000Z',title:'A\rATTENDEE:mailto:evil@x.com',kind:'Servicio',client:'',notes:'',reminder:0});
+ assert.ok(!/\r(?!\n)/.test(ics));assert.ok(!ics.split('\r\n').some(l=>l.startsWith('ATTENDEE')));
+});

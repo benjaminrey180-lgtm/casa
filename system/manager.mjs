@@ -1,36 +1,48 @@
 import {companyProfile} from './calendar.mjs';
 import {randomUUID} from 'node:crypto';
-import {mkdir,readFile,writeFile,rename} from 'node:fs/promises';
+import {mkdtemp,rm} from 'node:fs/promises';
 import {GoogleGenAI} from '@google/genai';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
-import {homedir} from 'node:os';
+import {homedir,tmpdir} from 'node:os';
 import {join} from 'node:path';
 
 const execFileAsync = promisify(execFile);
 
-// Herramientas de Claude Code que pueden modificar archivos, ejecutar comandos o salir a Internet.
 // Los trabajadores solo redactan: "No envía ni publica por su cuenta".
-const CLAUDE_BLOCKED_TOOLS = 'Bash,Edit,Write,MultiEdit,NotebookEdit,WebFetch,WebSearch';
-
-// Se usa execFile sin shell: el prompt viaja como argumento y no puede inyectar comandos.
+// Claude Code sin ninguna herramienta (tampoco Read/Glob/Grep) y sin cargar ajustes ni MCP locales.
+// '--' separa las opciones del prompt: un texto que empiece por '-' no puede convertirse en una opción.
 export function cliCommand(engine, prompt) {
   const bin = name => join(homedir(), '.local', 'bin', name);
-  if (['Claude Code', 'Antigravity', 'Arena'].includes(engine)) return [bin('claude'), ['-p', prompt, '--disallowedTools', CLAUDE_BLOCKED_TOOLS]];
-  if (engine === 'ChatGPT / Codex') return [bin('codex'), ['exec', '--sandbox', 'read-only', prompt]];
+  if (['Claude Code', 'Antigravity', 'Arena'].includes(engine)) return [bin('claude'), ['-p', '--tools', '', '--permission-mode', 'dontAsk', '--setting-sources', '', '--strict-mcp-config', '--', prompt]];
+  if (engine === 'ChatGPT / Codex') return [bin('codex'), ['exec', '--sandbox', 'read-only', '--skip-git-repo-check', '--', prompt]];
   if (engine === 'Hermes') return [bin('hermes'), [prompt]];
   throw new Error('No CLI mapping for ' + engine);
 }
 
+// Solo lo necesario para que la CLI encuentre su sesión; nunca las credenciales de canales ni DATABASE_URL.
+function cliEnv() {
+  const keep = ['PATH', 'HOME', 'LANG', 'TERM', 'USER', 'ANTHROPIC_API_KEY', 'OPENAI_API_KEY'];
+  return Object.fromEntries(keep.filter(k => process.env[k]).map(k => [k, process.env[k]]));
+}
+
 async function runCLI(engine, instruction, context) {
-  const prompt = `${instruction} - Contexto de la solicitud: ${context}`;
+  // El prompt empieza con texto fijo para que nunca comience por '-' (Hermes no documenta '--').
+  const prompt = `Tarea: ${instruction} - Contexto de la solicitud: ${context}`;
   const [file, args] = cliCommand(engine, prompt);
+  // Directorio vacío y temporal: el agente no trabaja dentro del proyecto ni junto al .env.
+  const cwd = await mkdtemp(join(tmpdir(), 'ion-agent-'));
 
   try {
-    const { stdout, stderr } = await execFileAsync(file, args, { env: process.env, cwd: process.cwd(), timeout: 120000, maxBuffer: 4 * 1024 * 1024 });
-    return stdout || stderr || 'Sin salida';
+    const { stdout } = await execFileAsync(file, args, { env: cliEnv(), cwd, timeout: 120000, maxBuffer: 4 * 1024 * 1024 });
+    if (!stdout.trim()) throw Error('El agente no devolvió resultado.');
+    return stdout;
   } catch (e) {
-    return `Error en ejecución CLI: ${e.message}\n${e.stdout || ''}\n${e.stderr || ''}`;
+    // El detalle (rutas, stderr) queda en el log del servidor, no en la API.
+    console.error(`Agente ${engine}:`, e.message, e.stderr || '');
+    throw Error(`El agente ${engine} no pudo completar la tarea. Revisa el registro del servidor.`);
+  } finally {
+    await rm(cwd, {recursive: true, force: true});
   }
 }
 
@@ -56,7 +68,8 @@ export async function runGemini(prompt,schema){
     }
     return response.text;
   } catch(e) {
-    throw new Error('El agente no pudo responder: ' + e.message);
+    console.error('Gemini:', e.message);
+    throw new Error('El motor Gemini no pudo responder. Revisa el registro del servidor.');
   }
 }
 
@@ -65,7 +78,8 @@ export async function createManager({runner=runGemini}={}){
  let busy=false;
  
  const getJobs = async () => {
-   const {rows} = await pool.query('SELECT * FROM jobs ORDER BY created_at ASC');
+   // Últimos 200 trabajos, en orden cronológico (el panel muestra 8 y el jefe usa 4 de contexto).
+   const {rows} = await pool.query('SELECT * FROM (SELECT * FROM jobs ORDER BY created_at DESC LIMIT 200) recent ORDER BY created_at ASC');
    return rows.map(r=>({...r, requestId:r.request_id, createdAt:r.created_at, tasks:r.tasks||[]}));
  };
  
@@ -123,7 +137,7 @@ export async function createManager({runner=runGemini}={}){
  
  return {state:async()=>{
   const currentJobs = await getJobs();
-  return {busy,jobs:currentJobs,engine:'Gemini 2.5 + CLI Agents',capability:'Conexión directa al PC para Claude Code, Hermes y otros agentes locales'};
+  return {busy,jobs:currentJobs,engine:'Gemini 2.5 + CLI Agents',configured:Boolean(process.env.GEMINI_API_KEY),capability:'Conexión directa al PC para Claude Code, Hermes y otros agentes locales'};
  },submit:async(text,requestId,sectors)=>{
   if(typeof text!=='string'||!text.trim()||text.length>4000||typeof requestId!=='string'||!/^[a-zA-Z0-9-]{16,80}$/.test(requestId))throw Object.assign(Error('Escribe una petición válida.'),{status:400});
   const currentJobs = await getJobs();

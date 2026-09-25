@@ -31,9 +31,10 @@ test('Fallo del motor es visible y un reinicio no repite acciones',async()=>{
 test('Los agentes CLI reciben el prompt como argumento, sin shell y en modo restringido',()=>{
  const hostile='hola"; rm -rf ~ ; echo "$(whoami)` + "`id`" + `\\';
  const [claudeBin,claudeArgs]=cliCommand('Claude Code',hostile);
- assert.match(claudeBin,/\.local\/bin\/claude$/);assert.equal(claudeArgs[1],hostile);
- assert.ok(claudeArgs.includes('--disallowedTools'));assert.match(claudeArgs.at(-1),/Bash/);
- const [codexBin,codexArgs]=cliCommand('ChatGPT / Codex',hostile);
- assert.match(codexBin,/codex$/);assert.deepEqual(codexArgs,['exec','--sandbox','read-only',hostile]);
+ assert.match(claudeBin,/\.local\/bin\/claude$/);
+ assert.equal(claudeArgs.at(-1),hostile);assert.equal(claudeArgs.at(-2),'--','el prompt va después de --');
+ assert.equal(claudeArgs[claudeArgs.indexOf('--tools')+1],'','sin herramientas');
+ const [codexBin,codexArgs]=cliCommand('ChatGPT / Codex','-v');
+ assert.match(codexBin,/codex$/);assert.deepEqual(codexArgs.slice(-2),['--','-v']);assert.ok(codexArgs.includes('read-only'));
  assert.throws(()=>cliCommand('Desconocido','x'));
 });

@@ -27,7 +27,7 @@ test('Usuarios, sesiones y límite de intentos',async()=>{
 test('Servidor: modo local sin usuarios, túnel bloqueado y sesión obligatoria al crear usuarios',async()=>{
  await resetDB();
  const port=4300+Math.floor(Math.random()*90);
- const server=spawn(process.execPath,['server.mjs'],{cwd:new URL('..',import.meta.url),env:{...process.env,PORT:String(port)},stdio:['ignore','pipe','pipe']});
+ const server=spawn(process.execPath,['server.mjs'],{cwd:new URL('..',import.meta.url),env:{...process.env,PORT:String(port),PUBLIC_ORIGIN:'https://abc.a.free.pinggy.net'},stdio:['ignore','pipe','pipe']});
  try{
   await new Promise((resolve,reject)=>{server.stdout.on('data',d=>String(d).includes('ION:')&&resolve());server.on('exit',c=>reject(Error('Servidor terminó '+c)));setTimeout(()=>reject(Error('Timeout')),8000);});
   const base=`http://127.0.0.1:${port}`;
@@ -35,8 +35,15 @@ test('Servidor: modo local sin usuarios, túnel bloqueado y sesión obligatoria 
   assert.equal((await get('/health')).status,200);
   assert.equal((await get('/api/state')).status,200,'modo local sin usuarios');
   // fetch no permite cambiar Host; se usa http.request para simular el túnel.
-  const tunnel=await new Promise((resolve,reject)=>http.get({host:'127.0.0.1',port,path:'/api/inbox',headers:{Host:'abc.a.free.pinggy.net'}},r=>{r.resume();resolve(r.statusCode);}).on('error',reject));
-  assert.equal(tunnel,401,'túnel sin sesión');
+  const withHost=(host,path='/api/inbox')=>new Promise((resolve,reject)=>http.get({host:'127.0.0.1',port,path,headers:{Host:host}},r=>{r.resume();resolve(r.statusCode);}).on('error',reject));
+  assert.equal(await withHost('abc.a.free.pinggy.net'),401,'túnel configurado sin sesión');
+  assert.equal(await withHost('rebind.atacante.com'),421,'DNS rebinding');
+  assert.equal(await withHost('otro.a.free.pinggy.net','/webhooks/meta'),503,'webhooks siguen llegando por cualquier host (503: Meta sin configurar)');
+  const csrf=await fetch(base+'/api/sectors',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({name:'Sin origen'})});
+  assert.equal(csrf.status,403,'escritura sin Origin');
+  const local=await fetch(base+'/api/sectors',{method:'POST',headers:{'Content-Type':'application/json',Origin:`http://localhost:${port}`},body:JSON.stringify({name:'Desde localhost'})});
+  assert.equal(local.status,201,'crear sector desde localhost (antes 403)');
+  assert.match((await get('/')).headers.get('content-security-policy'),/frame-ancestors 'none'/);
   assert.equal((await get('/api/inbox',{'X-Forwarded-For':'8.8.8.8'})).status,401,'proxy sin sesión');
   await createUser({email:'admin@ion.cl',name:'Admin',password:'suficientemente-larga',role:'SUPERADMIN'});
   await createUser({email:'cliente@duo.cl',name:'Dúo',password:'suficientemente-larga',role:'ADMIN_CLIENTE',tenant:'duo'});
