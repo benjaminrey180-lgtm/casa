@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+# Las landings de placas NFC llevan noindex en la propia página (no se bloquean aquí
+# para que Google pueda leer esa etiqueta).
+
+Sitemap: https://iongroup.cl/sitemap.xml

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solo URLs que existen y responden 200. Agregar /proyectos/[slug] y páginas de categoría cuando se publiquen. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://iongroup.cl/</loc><lastmod>2026-09-25</lastmod></url>
+</urlset>
