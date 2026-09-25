@@ -3,15 +3,17 @@
 Objetivo: Git → tests → deploy → health check → producción, con rollback y entornos separados.
 
 ```
-Internet → DNS (iongroup.cl, subdominios) → Caddy (HTTPS automático)
-   ├─ iongroup.cl            → web estática (/srv/ion/web/current)
-   │    ├─ /nfc/*            → Oficina ION 127.0.0.1:4310
-   │    └─ /webhooks/*       → Oficina ION 127.0.0.1:4310
-   ├─ oficina.iongroup.cl    → Oficina ION 127.0.0.1:4310 (opcional, con login)
-   ├─ staging.iongroup.cl    → Oficina ION 127.0.0.1:4311 (noindex)
-   └─ duo./capitalbarber./goldenroll.iongroup.cl → sistemas de clientes (sin cambios hasta auditar)
+Internet → DNS → Caddy (HTTPS automático)
+   ├─ iongroup.cl         → web pública de ION GROUP (estática, /srv/ion/web/current)
+   ├─ sis.iongroup.cl     → sistema Oficina ION con login + webhooks   (127.0.0.1:4310)
+   ├─ nfc.iongroup.cl     → tarjeta digital animada de ION en "/" y placas de clientes en "/[código]" (127.0.0.1:4310)
+   └─ duo./capitalbarber./goldenroll.iongroup.cl → sistemas de clientes (sin cambios)
 PostgreSQL: solo en localhost o red privada; nunca expuesto a Internet.
 ```
+
+DNS pendiente: crear `sis.iongroup.cl` (registro A → 62.238.117.110). `nfc.iongroup.cl` ya existe y apunta al servidor:
+respaldar lo que sirve hoy antes de activar su bloque en Caddy. Variables: `PUBLIC_ORIGIN=https://sis.iongroup.cl`,
+`NFC_PUBLIC_BASE=https://nfc.iongroup.cl`.
 
 ## 0. Antes de tocar el servidor (obligatorio)
 

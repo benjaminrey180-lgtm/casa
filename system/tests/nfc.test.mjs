@@ -50,3 +50,20 @@ test('El título y los textos se escapan en la landing',async()=>{
  const {body}=await visit('/nfc/xss-test');
  assert.ok(!body.includes('<script>alert'));assert.ok(!body.includes('<img src=x'));
 });
+test('nfc.iongroup.cl: tarjeta de ION, contacto vCard, logo y URLs cortas de placas',async()=>{
+ await resetDB();
+ await saveTag({...base,code:'placa-demo'});
+ const get=async path=>{let status,headers,body;const handled=await handlePublic({method:'GET',headers:{'user-agent':'Mozilla/5.0 (iPhone)'}},{writeHead(c,h){status=c;headers=h},end(b){body=String(b)}},new URL('https://nfc.iongroup.cl'+path),{nfcHost:true,logoFile:async()=>Buffer.from('webp')});return {handled,status,headers,body};};
+ const card=await get('/');
+ assert.equal(card.status,200);assert.match(card.body,/ION GROUP/);assert.match(card.body,/wa\.me\/56921745933/);assert.match(card.body,/contacto\.vcf/);assert.match(card.body,/prefers-reduced-motion/);assert.match(card.headers['Content-Security-Policy'],/default-src 'none'/);
+ const vcf=await get('/contacto.vcf');
+ assert.equal(vcf.status,200);assert.match(vcf.headers['Content-Type'],/vcard/);assert.match(vcf.body,/BEGIN:VCARD/);assert.match(vcf.body,/TEL;TYPE=CELL,VOICE:\+56921745933/);assert.match(vcf.body,/\r\n/);
+ assert.equal((await get('/logo.webp')).headers['Content-Type'],'image/webp');
+ const short=await get('/placa-demo');
+ assert.equal(short.status,200);assert.match(short.body,/href="\/placa-demo\/a\/whatsapp"/);
+ const click=await get('/placa-demo/a/whatsapp');
+ assert.equal(click.status,302);assert.equal(click.headers.Location,'https://wa.me/56900000000');
+ assert.equal((await get('/nfc/placa-demo')).status,200,'compatibilidad /nfc/código');
+ const missing=await get('/app.js');
+ assert.equal(missing.status,404,'en el host NFC no se sirve nada del panel');assert.ok(missing.handled);
+});

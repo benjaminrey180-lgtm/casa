@@ -40,6 +40,8 @@ test('Servidor: modo local sin usuarios, túnel bloqueado y sesión obligatoria 
   const withHost=(host,path='/api/inbox')=>new Promise((resolve,reject)=>http.get({host:'127.0.0.1',port,path,headers:{Host:host}},r=>{r.resume();resolve(r.statusCode);}).on('error',reject));
   assert.equal(await withHost('abc.a.free.pinggy.net'),401,'túnel configurado sin sesión');
   assert.equal(await withHost('rebind.atacante.com'),421,'DNS rebinding');
+  assert.equal(await withHost('nfc.iongroup.cl','/'),200,'tarjeta de ION en nfc.iongroup.cl');
+  assert.equal(await withHost('nfc.iongroup.cl','/api/inbox'),404,'el panel no existe en el host NFC');
   assert.equal(await withHost('otro.a.free.pinggy.net','/webhooks/meta'),503,'webhooks siguen llegando por cualquier host (503: Meta sin configurar)');
   const csrf=await fetch(base+'/api/sectors',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({name:'Sin origen'})});
   assert.equal(csrf.status,403,'escritura sin Origin');

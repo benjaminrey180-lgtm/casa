@@ -16,7 +16,10 @@ import {allowedOrigin,allowedHost,securityHeaders} from './security.mjs';
 import {listClients,saveClient,checkClients,search,CATEGORIES,STATUSES,MODULES} from './clients.mjs';
 import {handlePublic as handleNFC,listTags,saveTag,setActive,qrSVG,ACTION_KINDS} from './nfc.mjs';
 // Dominio público donde viven las placas (iongroup.cl/nfc/[código]).
-const nfcBase=(process.env.NFC_PUBLIC_BASE||'https://iongroup.cl').replace(/\/$/,'');
+const nfcBase=(process.env.NFC_PUBLIC_BASE||'https://nfc.iongroup.cl').replace(/\/$/,'');
+// Host dedicado a las placas y a la tarjeta de ION (nfc.iongroup.cl): todo lo que llegue ahí es público y solo NFC.
+const nfcHost=(process.env.NFC_HOST||new URL(nfcBase).hostname).toLowerCase();
+const nfcLogo=()=>readFile(new URL('./public/assets/ion-group-logo-480.webp',import.meta.url));
 import {initAuth,login,logout,sessionUser,userCount,readCookie,sessionCookie,isLocalHost,clientIP,purgeSessions,PANEL_ROLES} from './auth.mjs';
 await initDB();
 await initAuth();
@@ -39,6 +42,8 @@ const server=http.createServer(async(req,res)=>{
   if(['/webhooks/meta','/webhooks/discord'].includes(url.pathname)){await integrations.webhook(req,res,url);return;}
   if(['/health','/api/health'].includes(url.pathname)&&req.method==='GET'){try{const dbMs=await checkDB();return json(200,{status:'ok',db:'ok',dbMs,uptime:Math.round(process.uptime()),version,revision});}catch{return json(503,{status:'error',db:'error',version});}}
   // Placas NFC/QR: públicas y servidas desde el dominio de ION, por eso van antes del control de host.
+  const reqHost=String(req.headers.host||'').replace(/:\d+$/,'').toLowerCase();
+  if(reqHost===nfcHost){await handleNFC(req,res,url,{nfcHost:true,logoFile:nfcLogo});return;}
   if(url.pathname.startsWith('/nfc/')&&await handleNFC(req,res,url))return;
   if(!allowedHost(req.headers.host))return json(421,{error:'Host no permitido. Si usas un túnel, define PUBLIC_ORIGIN.'});
   for(const [k,v] of Object.entries(securityHeaders))res.setHeader(k,v);

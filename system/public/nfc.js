@@ -21,7 +21,7 @@
    const head = el('div', null, 'nfc-head');
    const title = el('div'); title.append(el('h3', t.title), el('small', `${t.client}${t.campaign ? ' · ' + t.campaign : ''}`));
    head.append(title, el('span', t.active ? '● Activa' : '○ Inactiva', 'badge'));
-   const link = el('a', `${state.publicBase}/nfc/${t.code}`, 'nfc-url'); link.href = `/nfc/${encodeURIComponent(t.code)}`; link.target = '_blank'; link.rel = 'noopener';
+   const link = el('a', `${state.publicBase}/${t.code}`, 'nfc-url'); link.href = `/nfc/${encodeURIComponent(t.code)}`; link.target = '_blank'; link.rel = 'noopener';
    const stats = el('div', null, 'nfc-stats'); stats.append(stat('Hoy', t.today), stat('7 días', t.last7), stat('30 días', t.last30), stat('Total', t.visits), stat('Clics', t.clicks));
    const detail = el('ul', null, 'nfc-detail');
    for (const a of t.actions) detail.append(el('li', `${a.label}: ${t.byAction[a.id] || 0} clics${t.redirect_action === a.id ? ' · directo' : ''}`));

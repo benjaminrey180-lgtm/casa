@@ -22,11 +22,10 @@ www.iongroup.cl {
 
 iongroup.cl {
 	import seguridad
-	# Placas NFC/QR y webhooks de Meta/Discord: únicas rutas públicas de Oficina ION.
-	# Rutas exactas (path_regexp distingue mayúsculas). El Host original llega a Node, que rechaza (421)
-	# cualquier ruta del panel pedida con Host iongroup.cl.
-	@oficina path_regexp ^/(nfc/[a-z0-9-]{3,40}(/a/[a-z0-9-]{1,40})?/?|webhooks/(meta|discord))$
-	reverse_proxy @oficina 127.0.0.1:4310
+	# Solo la web pública de ION GROUP. El sistema vive en sis.iongroup.cl y la tarjeta en nfc.iongroup.cl.
+	# Enlaces antiguos /nfc/[código] redirigen al host de placas.
+	@nfcAntiguo path_regexp nfcold ^/nfc/(.*)$
+	redir @nfcAntiguo https://nfc.iongroup.cl/{re.nfcold.1} permanent
 	# Web corporativa estática.
 	root * /srv/ion/web/current
 	try_files {path}.html {path} {path}/index.html
@@ -39,12 +38,20 @@ iongroup.cl {
 	header @assets Cache-Control "public, max-age=604800"
 }
 
-# Panel interno. Decisión pendiente del dueño: subdominio propio (recomendado, con la autenticación
-# de la app) o solo por VPN/SSH. Si se habilita, definir PUBLIC_ORIGIN=https://oficina.iongroup.cl.
-# oficina.iongroup.cl {
-# 	import seguridad
-# 	reverse_proxy 127.0.0.1:4310
-# }
+# Sistema de ION GROUP (Oficina ION) con login. Requiere crear el registro DNS sis.iongroup.cl -> 62.238.117.110
+# y definir PUBLIC_ORIGIN=https://sis.iongroup.cl en /etc/ion/production.env. Aquí llegan también los webhooks.
+sis.iongroup.cl {
+	import seguridad
+	header X-Robots-Tag "noindex, nofollow"
+	reverse_proxy 127.0.0.1:4310
+}
+
+# Tarjeta de presentación de ION y placas NFC/QR de clientes (nfc.iongroup.cl/[código]).
+# El subdominio ya existe: ANTES de activar este bloque respaldar lo que sirve hoy.
+nfc.iongroup.cl {
+	import seguridad
+	reverse_proxy 127.0.0.1:4310
+}
 
 # Staging (no indexable).
 # staging.iongroup.cl {
