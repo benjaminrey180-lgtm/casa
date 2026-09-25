@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#08090a">
+<title>Ingresar · Oficina ION</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body class="login-page">
+<main class="login-card">
+ <img src="/assets/ion-group-logo.jpeg" alt="ION Group" width="72" height="72" class="login-logo">
+ <h1>Oficina ION</h1>
+ <p class="muted" id="loginHint">Ingresa con tu cuenta de ION Group.</p>
+ <form id="loginForm" novalidate>
+  <label for="loginEmail">Correo</label>
+  <input id="loginEmail" name="email" type="email" autocomplete="username" inputmode="email" required>
+  <label for="loginPassword">Contraseña</label>
+  <input id="loginPassword" name="password" type="password" autocomplete="current-password" required minlength="12">
+  <p class="login-error" id="loginError" role="alert" hidden></p>
+  <button class="primary" type="submit" id="loginButton">Ingresar</button>
+ </form>
+</main>
+<script src="/login.js"></script>
+</body>
+</html>

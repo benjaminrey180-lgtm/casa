@@ -11,7 +11,9 @@ const defaults = ['Dirección', 'Marketing', 'Finanzas', 'Ventas', 'Operaciones'
 import { pool, initDB, checkDB } from './db.mjs';
 const {version}=JSON.parse(await readFile(new URL('./package.json',import.meta.url),'utf8'));
 import {allowedOrigin} from './security.mjs';
+import {initAuth,login,logout,sessionUser,userCount,readCookie,sessionCookie,isLocalHost,PANEL_ROLES} from './auth.mjs';
 await initDB();
+await initAuth();
 const {rowCount: sectorCount} = await pool.query('SELECT 1 FROM sectors');
 if (sectorCount === 0) {
   for (let i = 0; i < defaults.length; i++) {
@@ -28,6 +30,19 @@ const server=http.createServer(async(req,res)=>{
   if(['/webhooks/meta','/webhooks/discord'].includes(url.pathname)){await integrations.webhook(req,res,url);return;}
   if(['/health','/api/health'].includes(url.pathname)&&req.method==='GET'){try{const dbMs=await checkDB();return json(200,{status:'ok',db:'ok',dbMs,uptime:Math.round(process.uptime()),version});}catch{return json(503,{status:'error',db:'error',version});}}
   if(req.method==='POST'&&req.headers.origin&&!allowedOrigin(req.headers.origin))return json(403,{error:'Origen no permitido'});
+  // Autenticación: público solo lo necesario para iniciar sesión.
+  if(req.method==='POST'&&url.pathname==='/api/login'){if(!req.headers.origin)return json(403,{error:'Origen no permitido'});let input;try{input=JSON.parse(await rawBody(req));}catch{return json(400,{error:'Solicitud inválida'});}const session=await login(input||{},req.socket.remoteAddress);res.setHeader('Set-Cookie',sessionCookie(session.token,session.expires,!isLocalHost(req)));return json(200,{user:session.user});}
+  if(req.method==='POST'&&url.pathname==='/api/logout'){await logout(readCookie(req));res.setHeader('Set-Cookie',sessionCookie('',null,!isLocalHost(req)));return json(200,{ok:true});}
+  const publicPaths=['/login.html','/login.js','/style.css','/assets/ion-group-logo.jpeg','/nfc.html','/api/me'];
+  const user=await sessionUser(readCookie(req));
+  const users=await userCount();
+  // Sin usuarios creados se conserva el modo local anterior, pero nunca a través de un túnel o proxy.
+  const allowed=(user&&PANEL_ROLES.includes(user.role))||(users===0&&isLocalHost(req));
+  if(req.method==='GET'&&url.pathname==='/api/me')return json(200,{user,setupRequired:users===0,localMode:!user&&users===0&&isLocalHost(req)});
+  if(!allowed&&!publicPaths.includes(url.pathname)){
+   if(url.pathname.startsWith('/api/'))return json(401,{error:users===0?'Crea el primer usuario administrador con npm run user:create.':'Inicia sesión.'});
+   res.writeHead(302,{Location:'/login.html','Cache-Control':'no-store'});return res.end();
+  }
   if(req.method==='GET'&&url.pathname==='/api/calendar')return json(200,{events:await calendar.list()});
   if(req.method==='GET'&&url.pathname==='/api/calendar/export'){const events = await calendar.list(); const event=events.find(e=>e.id===url.searchParams.get('id'));if(!event)return json(404,{error:'Compromiso no encontrado'});res.writeHead(200,{'Content-Type':'text/calendar; charset=utf-8','Content-Disposition':'attachment; filename="ion-compromiso.ics"'});return res.end(eventICS(event));}
   if(req.method==='POST'&&['/api/calendar','/api/calendar/status'].includes(req.url)){let input;try{input=JSON.parse(await rawBody(req));}catch{return json(400,{error:'Solicitud inválida'});}return json(200,await(req.url.endsWith('/status')?calendar.toggle(input):calendar.save(input)));}
@@ -65,7 +80,7 @@ const server=http.createServer(async(req,res)=>{
    await pool.query('UPDATE sectors SET agent=$1 WHERE id=$2', [input.agent, input.id]);
    return json(200,{ok:true});
   }
-  if(req.method==='GET'&&['/','/nfc.html','/app.js','/style.css','/channels.js','/manager.js','/calendar.js','/assets/ion-group-logo.jpeg'].includes(req.url)){
+  if(req.method==='GET'&&['/','/nfc.html','/login.html','/login.js','/auth.js','/app.js','/style.css','/channels.js','/manager.js','/calendar.js','/assets/ion-group-logo.jpeg'].includes(req.url)){
    const name=req.url==='/'?'index.html':req.url.slice(1);res.writeHead(200,{'Content-Type':name.endsWith('.jpeg')?'image/jpeg':name.endsWith('.html')?'text/html; charset=utf-8':name.endsWith('.js')?'text/javascript; charset=utf-8':'text/css; charset=utf-8','Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'});return res.end(await readFile(new URL(`./public/${name}`,import.meta.url)));
   }
   json(404,{error:'No encontrado'});

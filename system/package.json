@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.mjs",
     "test": "node --test --test-concurrency=1 tests/*.test.mjs",
-    "discord:register": "node scripts/register-discord.mjs"
+    "discord:register": "node scripts/register-discord.mjs",
+    "user:create": "node scripts/create-user.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.24.0",

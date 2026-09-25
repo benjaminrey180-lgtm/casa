@@ -9,6 +9,8 @@ if (!/test/i.test(name)) {
 }
 const {pool, initDB} = await import('../db.mjs');
 await initDB();
-export async function resetDB() { await pool.query('TRUNCATE events, tasks, sectors, inbox, jobs'); }
+const {initAuth} = await import('../auth.mjs');
+await initAuth();
+export async function resetDB() { await pool.query('TRUNCATE events, tasks, sectors, inbox, jobs, sessions, users'); }
 after(() => pool.end());
 export {pool};
