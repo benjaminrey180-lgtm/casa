@@ -23,6 +23,8 @@ if (sectorCount === 0) {
 const integrations=await createIntegrations();
 const manager=await createManager();
 const calendar=await createCalendar();
+const staticFiles=['/','/nfc.html','/login.html','/login.js','/auth.js','/app.js','/style.css','/channels.js','/manager.js','/calendar.js','/manifest.webmanifest','/assets/ion-group-logo.jpeg','/assets/ion-group-logo-480.webp','/assets/ion-group-logo-960.webp','/assets/icon-192.png','/assets/icon-512.png','/assets/apple-touch-icon.png'];
+const mime={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',jpeg:'image/jpeg',webp:'image/webp',png:'image/png',webmanifest:'application/manifest+json'};
 async function readJSON(req){const raw=await rawBody(req);try{return JSON.parse(raw);}catch{throw Object.assign(Error('Solicitud inválida'),{status:400});}}
 const server=http.createServer(async(req,res)=>{
  const json=(code,value)=>{res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(value));};
@@ -37,7 +39,7 @@ const server=http.createServer(async(req,res)=>{
   // Autenticación: público solo lo necesario para iniciar sesión.
   if(req.method==='POST'&&url.pathname==='/api/login'){let input;input=await readJSON(req);const session=await login(input||{},req.socket.remoteAddress);res.setHeader('Set-Cookie',sessionCookie(session.token,session.expires,!isLocalHost(req)));return json(200,{user:session.user});}
   if(req.method==='POST'&&url.pathname==='/api/logout'){await logout(readCookie(req));res.setHeader('Set-Cookie',sessionCookie('',null,!isLocalHost(req)));return json(200,{ok:true});}
-  const publicPaths=['/login.html','/login.js','/style.css','/assets/ion-group-logo.jpeg','/nfc.html','/api/me'];
+  const publicPaths=['/login.html','/login.js','/style.css','/nfc.html','/api/me','/manifest.webmanifest','/assets/ion-group-logo.jpeg','/assets/ion-group-logo-480.webp','/assets/ion-group-logo-960.webp','/assets/icon-192.png','/assets/icon-512.png','/assets/apple-touch-icon.png'];
   const user=await sessionUser(readCookie(req));
   const users=await userCount();
   // Sin usuarios creados se conserva el modo local anterior, pero nunca a través de un túnel o proxy.
@@ -83,8 +85,11 @@ const server=http.createServer(async(req,res)=>{
    await pool.query('UPDATE sectors SET agent=$1 WHERE id=$2', [input.agent, input.id]);
    return json(200,{ok:true});
   }
-  if(req.method==='GET'&&['/','/nfc.html','/login.html','/login.js','/auth.js','/app.js','/style.css','/channels.js','/manager.js','/calendar.js','/assets/ion-group-logo.jpeg'].includes(req.url)){
-   const name=req.url==='/'?'index.html':req.url.slice(1);res.writeHead(200,{'Content-Type':name.endsWith('.jpeg')?'image/jpeg':name.endsWith('.html')?'text/html; charset=utf-8':name.endsWith('.js')?'text/javascript; charset=utf-8':'text/css; charset=utf-8','Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'});return res.end(await readFile(new URL(`./public/${name}`,import.meta.url)));
+  if(req.method==='GET'&&staticFiles.includes(req.url)){
+   const name=req.url==='/'?'index.html':req.url.slice(1);
+   // Los assets de imagen se cachean un día; HTML/JS/CSS se revalidan en cada carga.
+   res.writeHead(200,{'Content-Type':mime[name.split('.').pop()],'Cache-Control':name.startsWith('assets/')?'public, max-age=86400':'no-cache'});
+   return res.end(await readFile(new URL(`./public/${name}`,import.meta.url)));
   }
   json(404,{error:'No encontrado'});
  }catch(e){console.error(e.message);if(!res.headersSent)json(e.status||500,{error:e.status?e.message:'No se pudo completar la operación'});else res.end();}
