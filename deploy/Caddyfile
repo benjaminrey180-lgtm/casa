@@ -29,7 +29,7 @@ iongroup.cl {
 	}
 	# Web corporativa estática.
 	root * /srv/ion/web/current
-	try_files {path} {path}.html {path}/index.html
+	try_files {path}.html {path} {path}/index.html
 	file_server
 	handle_errors {
 		rewrite * /404.html

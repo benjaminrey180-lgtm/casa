@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Solo URLs que existen y responden 200. Agregar /proyectos/[slug] y páginas de categoría cuando se publiquen. -->
+<!-- Generado por build.mjs: solo páginas existentes. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://iongroup.cl/</loc><lastmod>2026-09-25</lastmod></url>
+  <url><loc>https://iongroup.cl/proyectos/vega-barron</loc><lastmod>2026-09-25</lastmod></url>
+  <url><loc>https://iongroup.cl/proyectos/capitals-barber</loc><lastmod>2026-09-25</lastmod></url>
+  <url><loc>https://iongroup.cl/proyectos/duo</loc><lastmod>2026-09-25</lastmod></url>
+  <url><loc>https://iongroup.cl/proyectos</loc><lastmod>2026-09-25</lastmod></url>
+  <url><loc>https://iongroup.cl/sistemas-para-restaurantes</loc><lastmod>2026-09-25</lastmod></url>
+  <url><loc>https://iongroup.cl/sistemas-para-barberias</loc><lastmod>2026-09-25</lastmod></url>
+  <url><loc>https://iongroup.cl/sistemas-de-reservas</loc><lastmod>2026-09-25</lastmod></url>
 </urlset>

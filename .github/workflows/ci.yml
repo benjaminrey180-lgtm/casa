@@ -49,6 +49,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Páginas generadas al día con data/sitio.json
+        run: |
+          cd web && node build.mjs
+          # lastmod cambia con la fecha: se compara todo menos el sitemap.
+          git diff --exit-code -- . ':(exclude)sitemap.xml'
       - name: JSON-LD válido
         run: |
           python3 - <<'PY'

@@ -1,0 +1,32 @@
+/* Estilo de las páginas de proyectos y categorías. Autónomo: no depende de css/styles.css.
+   Al recuperar el CSS principal del sitio, alinear colores y tipografía con él. */
+:root{--bg:#0b0b0c;--panel:#141517;--line:#2a2c30;--text:#f3f3f4;--muted:#b3b5bb;--accent:#f5f5f5;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:inherit}
+.wrap{width:min(100% - 32px,1040px);margin-inline:auto}
+.top{border-bottom:1px solid var(--line);position:sticky;top:0;background:#0b0b0ce6;backdrop-filter:blur(8px);z-index:5}
+.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:60px;flex-wrap:wrap}
+.brand{font-weight:800;letter-spacing:.08em;text-decoration:none}
+.top nav{display:flex;gap:6px;flex-wrap:wrap}
+.top nav a{text-decoration:none;padding:10px 12px;border-radius:10px;color:var(--muted);min-height:44px;display:inline-flex;align-items:center}
+.top nav a:hover{color:var(--text)}.top nav a.cta{background:var(--accent);color:#111;font-weight:650}
+main{padding:28px 0 56px}
+.crumbs{font-size:14px;color:var(--muted);margin-bottom:18px}.crumbs a{color:var(--muted)}
+h1{font-size:clamp(30px,6vw,48px);line-height:1.1;letter-spacing:-.02em;margin:0 0 14px}
+h2{font-size:clamp(21px,3.5vw,27px);margin:40px 0 12px}h3{margin:0 0 6px;font-size:18px}
+.lead{font-size:clamp(17px,2.4vw,20px);color:var(--muted);max-width:720px}
+.tag{display:inline-block;font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}.card p{margin:6px 0 10px;color:var(--muted)}
+.card h3 a{text-decoration:none}.card h3 a:hover{text-decoration:underline}
+.checks{padding:0;list-style:none;display:grid;gap:8px}.checks li::before{content:"✓ ";color:#9be89b;font-weight:700}
+.steps{padding-left:22px;display:grid;gap:8px}
+.note{font-size:14px;color:var(--muted)}
+.cta-box{margin-top:48px;padding:26px;border:1px solid var(--line);border-radius:20px;background:var(--panel)}
+.cta-box h2{margin-top:0}.actions{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;border-radius:12px;border:1px solid var(--line);text-decoration:none;font-weight:650}
+.btn.primary{background:var(--accent);color:#111;border-color:var(--accent)}
+a:focus-visible{outline:3px solid #9a85ff;outline-offset:2px}
+.foot{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-size:14px}.foot p{margin:4px 0}
+@media(prefers-reduced-motion:no-preference){.btn,.top nav a{transition:background .15s,color .15s}}
