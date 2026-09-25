@@ -74,42 +74,32 @@ Conclusión: todo apunta a **un único servidor**. Es un punto único de falla, 
 | 5 | Media | Sin health checks | `/health` y `/api/health` con ping a la BD |
 | 6 | Baja | El panel decía "Motor: Claude Code" aunque el motor es Gemini | El texto sale del servidor |
 
-### Pendientes (ver la revisión cruzada en §6)
-- **El panel expuesto por el túnel no tiene autenticación.** Cualquiera con la URL lee la bandeja de clientes y puede responder a nombre de ION. Es el riesgo más alto que queda.
-- No hay migraciones versionadas ni respaldos automáticos de la base.
-- La web pública está incompleta en el repo y el sitio responde con error SSL.
-- La página NFC es estática: no permite cambiar el destino ni registra estadísticas.
+### Estado del plan (Fase F, 2026-09-25)
 
-## 5. Plan priorizado (Fase B)
+| Prioridad | Punto | Estado |
+|---|---|---|
+| P0 | Autenticación, sesiones y roles | ✅ Hecho y probado (unitarias + de punta a punta + revisión cruzada) |
+| P0 | Migraciones versionadas | ✅ `migrations/`, `schema_migrations`, verificación de esquema |
+| P0 | Respaldos con prueba de restauración | ✅ `backup.sh` + `restore-test.sh` probados; falta programarlos en el servidor |
+| P0 | Auditoría del servidor 62.238.117.110 | ⛔ Bloqueado: requiere acceso (checklist en `DESPLIEGUE.md` §0) |
+| P1 | Módulo NFC/QR con analítica | ✅ Panel, landing, QR, estadísticas sin datos personales |
+| P1 | Web: SEO técnico, portafolio y categorías | ✅ Metadatos, JSON-LD, sitemap, robots, 404 y 7 páginas generadas. ⚠️ Faltan CSS, JS e imágenes originales del sitio |
+| P1 | Registro central de clientes | ✅ Cartera con estado en línea y mensualidades |
+| P2 | CI, deploy con rollback y staging | ✅ CI en GitHub Actions; `deploy.sh` probado con rollback; Caddy probado. Falta instalarlo en el servidor |
+| P2 | Monitoreo | ✅ `/health` + chequeo de clientes cada 10 min. Falta un monitor externo |
+| P2 | PWA del panel | ✅ Manifest e íconos (sin service worker, a propósito) |
+| P2 | Búsqueda tolerante | ✅ Sin tildes, parcial, errores pequeños y sinónimos |
+| P2 | Panel SEO (punto 28) | ⛔ El prompt llegó cortado en ese punto |
+| — | SEO local de clientes y Google Business Profile | 📋 Guía y datos a pedir en `SEO-LOCAL.md`; faltan los datos reales de cada cliente |
 
-Las dependencias se indican con →.
-
-**P0 — Seguridad y operación (antes de exponer nada)**
-1. Autenticación del panel: sesiones con cookie HttpOnly y roles SUPERADMIN, ADMIN CLIENTE, TRABAJADOR y USUARIO. Mientras tanto, **no usar el túnel pinggy** o protegerlo con contraseña.
-2. Migraciones versionadas (`migrations/NNN_*.sql` + tabla `schema_migrations`), solo aditivas.
-3. Respaldos: `pg_dump` diario con retención (7 diarios, 4 semanales, 6 mensuales), copia fuera del servidor y **prueba de restauración** documentada.
-4. Auditoría del servidor 62.238.117.110. Necesita acceso SSH o que el dueño comparta la configuración: nginx/caddy, certbot, servicios, puertos, firewall.
-
-**P1 — Producto**
-5. Módulo NFC/QR dinámico: `iongroup.cl/nfc/[codigo]` con destino editable, activo/inactivo y analítica sin datos personales (depende de 1 y 2).
-6. Web iongroup.cl: recuperar CSS/JS/imágenes del servidor, corregir SEO técnico, agregar JSON-LD, sitemap y robots, y crear páginas `/proyectos/[slug]`.
-7. Registro central de clientes (tenants): nombre, subdominio, sistema, estado, mensualidad y módulos. Alimenta el sitemap, el portafolio, el NFC y el monitoreo.
-
-**P2 — Plataforma**
-8. Deploy: Git → tests → build → deploy → health check, con entornos development, staging y production y rollback al release anterior.
-9. Monitoreo: comprobar `/health` de cada subdominio de cliente, con alertas.
-10. PWA del panel: manifest, íconos y service worker **sin cachear datos de clientes**.
-11. Búsqueda interna con tolerancia a errores (normalizar tildes, trigramas con `pg_trgm`).
-12. Panel SEO (el punto 28 del prompt maestro llegó cortado).
-
-### Qué necesita el dueño (bloqueos reales)
-- Acceso al servidor 62.238.117.110, o su configuración: reverse proxy, certificados y servicios.
-- Los archivos faltantes del sitio: `css/styles.css`, `js/main.js` e `img/*`.
-- El código o repositorio de los sistemas de Dúo, Capital Barber, Golden Roll y Vega Barrón.
-- Datos verificados de cada cliente para SEO local: dirección, comuna, horarios, teléfono, enlace de Google Business Profile y autorización para publicarlos.
-- Cómo invocar Hermes y Antigravity y qué permisos tienen. Esta sesión en la nube no puede ejecutarlos.
-- El texto completo del punto 28 en adelante del prompt maestro.
+### Riesgos que siguen abiertos
+- **Hermes** se ejecuta sin restricciones conocidas, y **Codex** en modo solo lectura puede leer todo el disco. Para sectores con esos agentes, conviene ejecutarlos con un usuario del sistema aislado.
+- **Multi-cliente:** los datos todavía no se filtran por `tenant`. Antes de abrir el panel a `ADMIN_CLIENTE` hay que agregar ese filtro en NFC y en la cartera.
+- **Túnel pinggy:** con usuarios creados, el panel exige login; aun así, lo recomendable es `oficina.iongroup.cl` con HTTPS propio.
+- **La web en el repo no está completa.** Antes de desplegarla hay que recuperar `css/styles.css`, `js/main.js` e `img/*` desde el servidor, para no publicar un sitio sin estilos.
 
 ## 6. Revisión cruzada (Fase D)
 
-Ver `docs/REVISION.md`.
+Cuatro agentes revisores independientes (Claude): seguridad, QA/móvil, SEO y una segunda ronda sobre el código nuevo. Sus hallazgos, con el detalle de cada corrección, están en los mensajes de commit del PR. Todos los críticos, altos y medios quedaron corregidos y verificados. Los bajos que se dejaron pendientes aparecen en "Riesgos que siguen abiertos".
+
+Codex, Hermes y Antigravity no se pudieron usar como revisores porque viven en el Mac del dueño, fuera de esta sesión en la nube.
