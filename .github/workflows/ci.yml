@@ -51,7 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: shellcheck
-        run: shellcheck deploy/deploy.sh system/scripts/*.sh
+        run: shellcheck deploy/*.sh system/scripts/*.sh
 
   web:
     runs-on: ubuntu-latest
