@@ -11,6 +11,9 @@ const defaults = ['Dirección', 'Marketing', 'Finanzas', 'Ventas', 'Operaciones'
 import { pool, initDB, checkDB } from './db.mjs';
 const {version}=JSON.parse(await readFile(new URL('./package.json',import.meta.url),'utf8'));
 import {allowedOrigin,allowedHost,securityHeaders} from './security.mjs';
+import {handlePublic as handleNFC,listTags,saveTag,setActive,qrSVG,ACTION_KINDS} from './nfc.mjs';
+// Dominio público donde viven las placas (iongroup.cl/nfc/[código]).
+const nfcBase=(process.env.NFC_PUBLIC_BASE||'https://iongroup.cl').replace(/\/$/,'');
 import {initAuth,login,logout,sessionUser,userCount,readCookie,sessionCookie,isLocalHost,PANEL_ROLES} from './auth.mjs';
 await initDB();
 await initAuth();
@@ -23,7 +26,7 @@ if (sectorCount === 0) {
 const integrations=await createIntegrations();
 const manager=await createManager();
 const calendar=await createCalendar();
-const staticFiles=['/','/nfc.html','/login.html','/login.js','/auth.js','/app.js','/style.css','/channels.js','/manager.js','/calendar.js','/manifest.webmanifest','/assets/ion-group-logo.jpeg','/assets/ion-group-logo-480.webp','/assets/ion-group-logo-960.webp','/assets/icon-192.png','/assets/icon-512.png','/assets/apple-touch-icon.png'];
+const staticFiles=['/','/nfc.html','/login.html','/login.js','/auth.js','/app.js','/style.css','/channels.js','/manager.js','/calendar.js','/nfc.js','/manifest.webmanifest','/assets/ion-group-logo.jpeg','/assets/ion-group-logo-480.webp','/assets/ion-group-logo-960.webp','/assets/icon-192.png','/assets/icon-512.png','/assets/apple-touch-icon.png'];
 const mime={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',jpeg:'image/jpeg',webp:'image/webp',png:'image/png',webmanifest:'application/manifest+json'};
 async function readJSON(req){const raw=await rawBody(req);try{return JSON.parse(raw);}catch{throw Object.assign(Error('Solicitud inválida'),{status:400});}}
 const server=http.createServer(async(req,res)=>{
@@ -32,6 +35,8 @@ const server=http.createServer(async(req,res)=>{
   const url=new URL(req.url,'http://localhost');
   if(['/webhooks/meta','/webhooks/discord'].includes(url.pathname)){await integrations.webhook(req,res,url);return;}
   if(['/health','/api/health'].includes(url.pathname)&&req.method==='GET'){try{const dbMs=await checkDB();return json(200,{status:'ok',db:'ok',dbMs,uptime:Math.round(process.uptime()),version});}catch{return json(503,{status:'error',db:'error',version});}}
+  // Placas NFC/QR: públicas y servidas desde el dominio de ION, por eso van antes del control de host.
+  if(url.pathname.startsWith('/nfc/')&&await handleNFC(req,res,url))return;
   if(!allowedHost(req.headers.host))return json(421,{error:'Host no permitido. Si usas un túnel, define PUBLIC_ORIGIN.'});
   for(const [k,v] of Object.entries(securityHeaders))res.setHeader(k,v);
   // Toda escritura exige un Origin permitido (los navegadores lo envían siempre en POST).
@@ -54,6 +59,10 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==='POST'&&['/api/calendar','/api/calendar/status'].includes(req.url)){let input;input=await readJSON(req);return json(200,await(req.url.endsWith('/status')?calendar.toggle(input):calendar.save(input)));}
   if(req.method==='GET'&&req.url==='/api/manager')return json(200,await manager.state());
   if(req.method==='POST'&&req.url==='/api/manager'){let input;input=await readJSON(req);const {rows: sRows} = await pool.query('SELECT * FROM sectors');return json(202,await manager.submit(input?.text,input?.requestId,sRows));}
+  if(req.method==='GET'&&url.pathname==='/api/nfc')return json(200,{tags:await listTags(),kinds:ACTION_KINDS,publicBase:nfcBase});
+  if(req.method==='POST'&&url.pathname==='/api/nfc'){const input=await readJSON(req);return json(200,await saveTag(input||{}));}
+  if(req.method==='POST'&&url.pathname==='/api/nfc/status'){const input=await readJSON(req);return json(200,await setActive(input?.code,input?.active));}
+  if(req.method==='GET'&&url.pathname==='/api/nfc/qr'){const code=url.searchParams.get('code')||'';if(!/^[a-z0-9-]{3,40}$/.test(code))return json(400,{error:'Código inválido'});res.writeHead(200,{'Content-Type':'image/svg+xml','Content-Disposition':`attachment; filename="qr-${code}.svg"`,'Cache-Control':'no-store'});return res.end(await qrSVG(nfcBase,code));}
   if(req.method==='GET'&&req.url==='/api/integrations')return json(200,await integrations.status());
   if(req.method==='GET'&&req.url==='/api/inbox')return json(200,{messages:await integrations.inbox()});
   if(req.method==='POST'&&req.url==='/api/reply'){let input;input=await readJSON(req);return json(200,await integrations.reply(input||{}));}

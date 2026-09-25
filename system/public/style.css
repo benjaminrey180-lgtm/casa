@@ -35,3 +35,19 @@ header{flex-wrap:wrap}
 .session-logout{min-height:44px}
 .dialog-actions{position:sticky;bottom:0;background:inherit;padding:8px 0}
 @media(max-width:480px){.inspector{grid-template-columns:1fr}}
+/* NFC y QR */
+.nfc-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;margin-bottom:16px}
+.nfc-stat{display:grid;gap:2px}.nfc-stat b{font-size:22px}.nfc-stat span{font-size:12px;color:var(--muted)}
+.nfc-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+.nfc-card{display:grid;gap:12px}.nfc-card.inactive{opacity:.65}
+.nfc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.nfc-head h3{margin:0}.nfc-head small{color:var(--muted)}
+.nfc-url{font-size:13px;color:var(--muted);word-break:break-all}
+.nfc-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.nfc-stats b{font-size:17px}
+.nfc-detail{margin:0;padding-left:18px;font-size:13px;color:var(--muted)}
+.nfc-tools{display:flex;flex-wrap:wrap;gap:8px}.nfc-tools a.secondary{display:inline-flex;align-items:center;text-decoration:none}
+.nfc-actions{border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;display:grid;gap:8px}
+.nfc-action-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.4fr) 44px;gap:6px}
+.nfc-action-row input,.nfc-action-row select{min-width:0}
+.nfc-action-row+.nfc-action-row{border-top:1px solid var(--line);padding-top:10px}
+@media(max-width:560px){.nfc-action-row{grid-template-columns:1fr 44px}.nfc-action-row select,.nfc-action-row input:not([type=url]){grid-column:1/-1}.nfc-action-row input[type=url]{grid-column:1}.nfc-action-row button{grid-column:2}}
+.check{display:flex;gap:10px;align-items:center;justify-content:flex-start;margin-top:12px;text-align:left}.check input{width:22px;height:22px;min-height:0;margin:0;flex:none}

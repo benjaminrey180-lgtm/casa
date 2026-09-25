@@ -11,6 +11,6 @@ const {pool, initDB} = await import('../db.mjs');
 await initDB();
 const {initAuth} = await import('../auth.mjs');
 await initAuth();
-export async function resetDB() { await pool.query('TRUNCATE events, tasks, sectors, inbox, jobs, sessions, users'); }
+export async function resetDB() { await pool.query('TRUNCATE events, tasks, sectors, inbox, jobs, sessions, users, nfc_events, nfc_tags'); }
 after(() => pool.end());
 export {pool};
