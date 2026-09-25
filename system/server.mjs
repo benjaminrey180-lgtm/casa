@@ -8,7 +8,9 @@ import { readFile, mkdir, writeFile, rename } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 const agents = ['Hermes', 'Claude Code', 'Antigravity', 'ChatGPT / Codex', 'Arena'];
 const defaults = ['Dirección', 'Marketing', 'Finanzas', 'Ventas', 'Operaciones', 'Tecnología', 'Atención al cliente'];
-import { pool, initDB } from './db.mjs';
+import { pool, initDB, checkDB } from './db.mjs';
+const {version}=JSON.parse(await readFile(new URL('./package.json',import.meta.url),'utf8'));
+import {allowedOrigin} from './security.mjs';
 await initDB();
 const {rowCount: sectorCount} = await pool.query('SELECT 1 FROM sectors');
 if (sectorCount === 0) {
@@ -24,7 +26,8 @@ const server=http.createServer(async(req,res)=>{
  try {
   const url=new URL(req.url,'http://localhost');
   if(['/webhooks/meta','/webhooks/discord'].includes(url.pathname)){await integrations.webhook(req,res,url);return;}
-  if(req.method==='POST'&&req.headers.origin&&!req.headers.origin.includes('localhost')&&!req.headers.origin.includes('127.0.0.1')&&!req.headers.origin.includes('.pinggy.net'))return json(403,{error:'Origen no permitido'});
+  if(['/health','/api/health'].includes(url.pathname)&&req.method==='GET'){try{const dbMs=await checkDB();return json(200,{status:'ok',db:'ok',dbMs,uptime:Math.round(process.uptime()),version});}catch{return json(503,{status:'error',db:'error',version});}}
+  if(req.method==='POST'&&req.headers.origin&&!allowedOrigin(req.headers.origin))return json(403,{error:'Origen no permitido'});
   if(req.method==='GET'&&url.pathname==='/api/calendar')return json(200,{events:await calendar.list()});
   if(req.method==='GET'&&url.pathname==='/api/calendar/export'){const events = await calendar.list(); const event=events.find(e=>e.id===url.searchParams.get('id'));if(!event)return json(404,{error:'Compromiso no encontrado'});res.writeHead(200,{'Content-Type':'text/calendar; charset=utf-8','Content-Disposition':'attachment; filename="ion-compromiso.ics"'});return res.end(eventICS(event));}
   if(req.method==='POST'&&['/api/calendar','/api/calendar/status'].includes(req.url)){let input;try{input=JSON.parse(await rawBody(req));}catch{return json(400,{error:'Solicitud inválida'});}return json(200,await(req.url.endsWith('/status')?calendar.toggle(input):calendar.save(input)));}

@@ -3,10 +3,19 @@ const { Pool } = pkg;
 import { loadEnvFile } from 'node:process';
 try { loadEnvFile(new URL('./.env', import.meta.url)); } catch (e) { if (e.code !== 'ENOENT') throw e; }
 
+// DATABASE_SSL=disable para Postgres local sin SSL; DATABASE_SSL=verify para validar el certificado.
+// Sin valor se mantiene el comportamiento anterior (SSL sin verificar certificado).
+const sslMode = process.env.DATABASE_SSL || 'no-verify';
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: sslMode === 'disable' ? false : { rejectUnauthorized: sslMode === 'verify' }
 });
+
+export async function checkDB() {
+  const started = Date.now();
+  await pool.query('SELECT 1');
+  return Date.now() - started;
+}
 
 export async function initDB() {
   await pool.query(`

@@ -2,30 +2,32 @@ import {companyProfile} from './calendar.mjs';
 import {randomUUID} from 'node:crypto';
 import {mkdir,readFile,writeFile,rename} from 'node:fs/promises';
 import {GoogleGenAI} from '@google/genai';
-import {exec} from 'node:child_process';
+import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
+import {homedir} from 'node:os';
+import {join} from 'node:path';
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
+
+// Herramientas de Claude Code que pueden modificar archivos, ejecutar comandos o salir a Internet.
+// Los trabajadores solo redactan: "No envía ni publica por su cuenta".
+const CLAUDE_BLOCKED_TOOLS = 'Bash,Edit,Write,MultiEdit,NotebookEdit,WebFetch,WebSearch';
+
+// Se usa execFile sin shell: el prompt viaja como argumento y no puede inyectar comandos.
+export function cliCommand(engine, prompt) {
+  const bin = name => join(homedir(), '.local', 'bin', name);
+  if (['Claude Code', 'Antigravity', 'Arena'].includes(engine)) return [bin('claude'), ['-p', prompt, '--disallowedTools', CLAUDE_BLOCKED_TOOLS]];
+  if (engine === 'ChatGPT / Codex') return [bin('codex'), ['exec', '--sandbox', 'read-only', prompt]];
+  if (engine === 'Hermes') return [bin('hermes'), [prompt]];
+  throw new Error('No CLI mapping for ' + engine);
+}
 
 async function runCLI(engine, instruction, context) {
-  const sanitize = (str) => String(str).replace(/"/g, '\\"').replace(/\$/g, '\\$').replace(/`/g, '\\`');
   const prompt = `${instruction} - Contexto de la solicitud: ${context}`;
-  let cmd = '';
-
-  if (engine === 'Claude Code') {
-    cmd = `~/.local/bin/claude -p "${sanitize(prompt)}"`;
-  } else if (engine === 'Hermes') {
-    cmd = `~/.local/bin/hermes "${sanitize(prompt)}"`;
-  } else if (engine === 'ChatGPT / Codex') {
-    cmd = `~/.local/bin/codex exec "${sanitize(prompt)}"`;
-  } else if (engine === 'Antigravity' || engine === 'Arena') {
-    cmd = `~/.local/bin/claude -p "${sanitize(prompt)}"`;
-  } else {
-    throw new Error('No CLI mapping for ' + engine);
-  }
+  const [file, args] = cliCommand(engine, prompt);
 
   try {
-    const { stdout, stderr } = await execAsync(cmd, { env: process.env, cwd: process.cwd(), timeout: 120000, shell: '/bin/bash' });
+    const { stdout, stderr } = await execFileAsync(file, args, { env: process.env, cwd: process.cwd(), timeout: 120000, maxBuffer: 4 * 1024 * 1024 });
     return stdout || stderr || 'Sin salida';
   } catch (e) {
     return `Error en ejecución CLI: ${e.message}\n${e.stdout || ''}\n${e.stderr || ''}`;
