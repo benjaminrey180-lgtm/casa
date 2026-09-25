@@ -9,26 +9,8 @@ export const PANEL_ROLES = ['SUPERADMIN', 'TRABAJADOR'];
 const SESSION_DAYS = 7;
 const COOKIE = 'ion_session';
 
-export async function initAuth() {
- await pool.query(`
-  CREATE TABLE IF NOT EXISTS users (
-   id TEXT PRIMARY KEY,
-   email TEXT UNIQUE NOT NULL,
-   name TEXT NOT NULL,
-   password_hash TEXT NOT NULL,
-   role TEXT NOT NULL,
-   tenant TEXT,
-   active BOOLEAN NOT NULL DEFAULT TRUE,
-   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-  );
-  CREATE TABLE IF NOT EXISTS sessions (
-   token_hash TEXT PRIMARY KEY,
-   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-   expires_at TIMESTAMPTZ NOT NULL,
-   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-  );
- `);
-}
+// Las tablas se crean con migrations/002_auth.sql; se conserva por compatibilidad.
+export async function initAuth() {}
 
 export async function hashPassword(password) {
  const salt = randomBytes(16);
