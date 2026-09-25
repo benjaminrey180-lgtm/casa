@@ -1,0 +1,68 @@
+# Proxy inverso con HTTPS automático (Let's Encrypt) para el servidor de ION GROUP.
+# ANTES DE USAR: auditar lo que corre hoy en 62.238.117.110 (nginx/apache/certbot) y copiar su
+# configuración a deploy/legacy/. No reemplazar la configuración actual sin respaldo.
+{
+	email iongroupspa@gmail.com
+}
+
+(seguridad) {
+	header {
+		# Sin includeSubDomains hasta confirmar que duo/capitalbarber/goldenroll funcionan por HTTPS.
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+	encode zstd gzip
+}
+
+www.iongroup.cl {
+	redir https://iongroup.cl{uri} permanent
+}
+
+iongroup.cl {
+	import seguridad
+	# Solo la web pública de ION GROUP. El sistema vive en sis.iongroup.cl y la tarjeta en nfc.iongroup.cl.
+	# Enlaces antiguos /nfc/[código] redirigen al host de placas.
+	@nfcAntiguo path_regexp nfcold ^/nfc/(.*)$
+	redir @nfcAntiguo https://nfc.iongroup.cl/{re.nfcold.1} permanent
+	# Web corporativa estática.
+	root * /srv/ion/web/current
+	try_files {path}.html {path} {path}/index.html
+	file_server
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+	@assets path *.css *.js *.png *.jpg *.jpeg *.webp *.avif *.svg *.woff2
+	header @assets Cache-Control "public, max-age=604800"
+}
+
+# Sistema de ION GROUP (Oficina ION) con login. Requiere crear el registro DNS sis.iongroup.cl -> 62.238.117.110
+# y definir PUBLIC_ORIGIN=https://sis.iongroup.cl en /etc/ion/production.env. Aquí llegan también los webhooks.
+sis.iongroup.cl {
+	import seguridad
+	header X-Robots-Tag "noindex, nofollow"
+	reverse_proxy 127.0.0.1:4310
+}
+
+# Tarjeta de presentación de ION y placas NFC/QR de clientes (nfc.iongroup.cl/[código]).
+# El subdominio ya existe: ANTES de activar este bloque respaldar lo que sirve hoy.
+nfc.iongroup.cl {
+	import seguridad
+	reverse_proxy 127.0.0.1:4310
+}
+
+# Staging (no indexable).
+# staging.iongroup.cl {
+# 	import seguridad
+# 	header X-Robots-Tag "noindex, nofollow"
+# 	reverse_proxy 127.0.0.1:4311
+# }
+
+# Sistemas de clientes: duo, capitalbarber y goldenroll ya existen en DNS apuntando a este servidor.
+# NO cambiarlos hasta documentar qué aplicación y puerto atiende cada uno hoy. Plantilla:
+# duo.iongroup.cl {
+# 	import seguridad
+# 	reverse_proxy 127.0.0.1:PUERTO_ACTUAL
+# }

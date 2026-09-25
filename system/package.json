@@ -1,0 +1,19 @@
+{
+  "name": "ion-agent-office",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "discord:register": "node scripts/register-discord.mjs",
+    "user:create": "node scripts/create-user.mjs",
+    "db:backup": "scripts/backup.sh",
+    "db:restore-test": "scripts/restore-test.sh"
+  },
+  "dependencies": {
+    "@google/genai": "^2.24.0",
+    "pg": "^8.23.0",
+    "qrcode": "^1.5.4"
+  }
+}

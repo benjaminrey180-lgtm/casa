@@ -1,0 +1,163 @@
+{
+  "_nota": "Solo se publica contenido de ION GROUP. Un proyecto de cliente aparece en el sitio únicamente con \"publicar\": true y autorización del cliente.",
+  "base": "https://iongroup.cl",
+  "empresa": {
+    "nombre": "ION GROUP SpA",
+    "whatsapp": "56921745933",
+    "telefono": "+56 9 2174 5933",
+    "correo": "iongroupspa@gmail.com",
+    "instagram": "https://www.instagram.com/iongroup.cl/"
+  },
+  "proyectos": [
+    {
+      "slug": "vega-barron",
+      "nombre": "Vega Barrón SpA",
+      "categoria": "administracion",
+      "tipoNegocio": "LocalBusiness",
+      "region": "Ñuble",
+      "estado": "En producción",
+      "resumen": "Sistema de gestión administrativa para la administración del local de Vega Barrón SpA, en Ñuble.",
+      "solucion": "Desarrollamos un sistema administrativo a medida con acceso por usuarios y roles, comprobantes y trazabilidad de cada operación.",
+      "funcionalidades": [
+        "Registro de ingresos y egresos",
+        "Caja y cierre diario",
+        "Gestión de proveedores",
+        "Usuarios y roles",
+        "Comprobantes de cada operación",
+        "Reportes"
+      ],
+      "imagen": "/img/client-vega-barron.png",
+      "enlace": null,
+      "publicar": false
+    },
+    {
+      "slug": "capitals-barber",
+      "nombre": "Capital's Barber",
+      "categoria": "barberia",
+      "tipoNegocio": "HairSalon",
+      "region": null,
+      "estado": "En producción",
+      "resumen": "Sistema de ventas y reservas de horas para la barbería Capital's Barber.",
+      "solucion": "Un sistema que permite gestionar las ventas y coordinar las reservas de horas de forma simple y ordenada.",
+      "funcionalidades": [
+        "Agenda y reservas de horas",
+        "Registro de ventas",
+        "Coordinación de horarios"
+      ],
+      "imagen": "/img/client-capital-barber.png",
+      "enlace": null,
+      "publicar": false
+    },
+    {
+      "slug": "duo",
+      "nombre": "Dúo",
+      "categoria": "restaurante",
+      "tipoNegocio": "Restaurant",
+      "region": null,
+      "estado": "En desarrollo",
+      "resumen": "Sistema de pedidos y ventas a medida para Dúo, negocio de comida y bowls.",
+      "solucion": "Estamos desarrollando un sistema de pedidos, ventas y gestión adaptado a la operación diaria de Dúo.",
+      "funcionalidades": [
+        "Toma y seguimiento de pedidos",
+        "Registro de ventas",
+        "Gestión del negocio"
+      ],
+      "imagen": "/img/client-duo.png",
+      "enlace": null,
+      "publicar": false
+    }
+  ],
+  "categorias": [
+    {
+      "slug": "sistemas-para-restaurantes",
+      "clave": "restaurante",
+      "titulo": "Sistemas para restaurantes y negocios de comida",
+      "descripcion": "Software a medida para restaurantes, locales de comida y bowls en Chile: pedidos, ventas, caja y reportes adaptados a tu operación.",
+      "intro": "Un local de comida vive de la rapidez: tomar bien el pedido, cobrarlo sin errores y saber al cierre del día cuánto se vendió. Desarrollamos el sistema según cómo trabaja tu cocina y tu mesón, no al revés.",
+      "modulos": [
+        [
+          "Pedidos",
+          "Registro de pedidos para consumo en el local, retiro o despacho, con su estado desde que se toma hasta que se entrega."
+        ],
+        [
+          "Ventas y caja",
+          "Cobro, medios de pago, apertura y cierre diario de caja con el detalle de cada operación."
+        ],
+        [
+          "Menú y productos",
+          "Productos, precios y variantes organizados para que el equipo los encuentre rápido."
+        ],
+        [
+          "Inventario",
+          "Control de insumos y stock cuando tu operación lo necesita."
+        ],
+        [
+          "Reportes",
+          "Ventas por día, por producto y por medio de pago para decidir con datos."
+        ],
+        [
+          "Menú digital, NFC y QR",
+          "Accesos desde la mesa o el mesón al menú, a tus redes y a las reseñas de Google."
+        ]
+      ]
+    },
+    {
+      "slug": "sistemas-para-barberias",
+      "clave": "barberia",
+      "titulo": "Sistemas para barberías",
+      "descripcion": "Software a medida para barberías en Chile: reservas de horas, agenda por barbero, ventas y caja en un solo sistema.",
+      "intro": "En una barbería la agenda es el negocio. Un sistema pensado para el local permite que los clientes reserven, que cada barbero vea sus horas y que las ventas del día queden registradas sin cuadernos.",
+      "modulos": [
+        [
+          "Reservas de horas",
+          "Agenda con horarios y disponibilidad para que el cliente reserve sin llamar."
+        ],
+        [
+          "Agenda del equipo",
+          "Cada barbero ve sus horas del día y los cambios al momento."
+        ],
+        [
+          "Ventas y caja",
+          "Registro de servicios y productos vendidos, con cierre diario."
+        ],
+        [
+          "Integración con Google Calendar",
+          "La agenda del sistema conectada con tu calendario para no perder citas."
+        ],
+        [
+          "NFC y QR en el mesón",
+          "Un toque para reservar, seguir tu Instagram o dejar una reseña en Google."
+        ]
+      ]
+    },
+    {
+      "slug": "sistemas-de-reservas",
+      "clave": "reservas",
+      "titulo": "Sistemas de reservas a medida",
+      "descripcion": "Sistemas de reservas de horas a medida para negocios de servicios en Chile, con control de horarios, disponibilidad e integración con Google Calendar.",
+      "intro": "Si tu negocio atiende con hora, un sistema de reservas ordena el día: menos llamadas, menos horas perdidas y una agenda que todo el equipo ve igual.",
+      "modulos": [
+        [
+          "Reservas en línea",
+          "Tus clientes eligen servicio, día y hora disponibles."
+        ],
+        [
+          "Horarios y disponibilidad",
+          "Bloques, días libres y capacidad configurados según tu local."
+        ],
+        [
+          "Integración con Google Calendar",
+          "Las reservas aparecen en tu calendario."
+        ],
+        [
+          "Recordatorios y seguimiento",
+          "Información de cada reserva para atender mejor (según alcance del proyecto)."
+        ],
+        [
+          "Reportes",
+          "Ocupación y servicios más pedidos."
+        ]
+      ]
+    }
+  ]
+}

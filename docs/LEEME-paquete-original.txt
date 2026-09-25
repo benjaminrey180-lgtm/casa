@@ -1,0 +1,12 @@
+ION GROUP — paquete de código para Claude
+
+Contenido:
+- web/index.html: copia local de la página pública iongroup.cl encontrada en remote-edit.
+- web/ion-logo-transparent.png: logo disponible junto a esa página.
+- system/: código fuente, documentación y pruebas del sistema Oficina ION.
+- nfc/nfc.html: página NFC local preparada en el proyecto del sistema.
+
+Notas:
+- La página web original apunta a css/styles.css, js/main.js y a imágenes de la carpeta img, pero esos recursos no están disponibles en este workspace; por eso el HTML no constituye una copia ejecutable completa del sitio público.
+- El sitio público https://iongroup.cl/ respondió con error SSL durante la revisión, así que no se pudieron recuperar los recursos faltantes desde el servidor.
+- Se excluyeron .env, dependencias instaladas, la carpeta de datos de ejecución (incluía una solicitud privada y datos de cuentas comerciales), historial Git y el subproyecto laya. No se incluyeron credenciales.

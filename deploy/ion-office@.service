@@ -1,0 +1,32 @@
+# Oficina ION como servicio. Una instancia por entorno:
+#   systemctl enable --now ion-office@production   (puerto y variables en /etc/ion/production.env)
+#   systemctl enable --now ion-office@staging      (/etc/ion/staging.env, otra base de datos)
+[Unit]
+Description=Oficina ION (%i)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ion
+Group=ion
+WorkingDirectory=/srv/ion/%i/current/system
+EnvironmentFile=/etc/ion/%i.env
+ExecStart=/usr/bin/node server.mjs
+Restart=on-failure
+RestartSec=3
+# Aislamiento: sin privilegios nuevos, sistema de archivos de solo lectura salvo lo necesario.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+# Los respaldos los hace deploy.sh/cron, no el servicio. Si en el servidor se usan agentes CLI
+# (AGENT_BIN_DIR), agregar aquí sus directorios de estado, p. ej. ReadWritePaths=/srv/ion/.claude
+
+[Install]
+WantedBy=multi-user.target

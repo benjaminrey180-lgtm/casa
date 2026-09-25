@@ -1,0 +1,26 @@
+-- Registro central de clientes/sistemas de ION GROUP (panel central) y su estado online.
+CREATE TABLE IF NOT EXISTS clients (
+  id TEXT PRIMARY KEY,
+  slug TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  company TEXT NOT NULL DEFAULT '',
+  category TEXT NOT NULL DEFAULT 'otro',
+  city TEXT NOT NULL DEFAULT '',
+  system TEXT NOT NULL DEFAULT '',
+  domain TEXT NOT NULL DEFAULT '',
+  health_url TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'desarrollo',
+  start_date DATE,
+  monthly_fee INTEGER,
+  services TEXT NOT NULL DEFAULT '',
+  contact TEXT NOT NULL DEFAULT '',
+  notes TEXT NOT NULL DEFAULT '',
+  modules JSONB NOT NULL DEFAULT '[]',
+  public_portfolio BOOLEAN NOT NULL DEFAULT FALSE,
+  last_check_at TIMESTAMPTZ,
+  last_check_ok BOOLEAN,
+  last_check_ms INTEGER,
+  last_check_detail TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
