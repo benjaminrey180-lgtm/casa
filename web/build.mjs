@@ -3,6 +3,8 @@
 import {readFile, writeFile, mkdir} from 'node:fs/promises';
 
 const site = JSON.parse(await readFile(new URL('./data/sitio.json', import.meta.url), 'utf8'));
+// Solo proyectos con publicar: true (requiere autorización del cliente).
+site.proyectos = site.proyectos.filter(p => p.publicar === true);
 const {base, empresa} = site;
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 const ld = obj => `<script type="application/ld+json">\n${JSON.stringify(obj, null, 1)}\n</script>`;
@@ -34,7 +36,7 @@ ${ld(crumbs)}
 ${jsonld ? ld(jsonld) : ''}
 </head>
 <body>
-<header class="top"><div class="wrap"><a class="brand" href="/">ION GROUP</a><nav aria-label="Principal"><a href="/#servicios">Servicios</a><a href="/proyectos">Proyectos</a><a class="cta" href="/#contacto">Cotizar</a></nav></div></header>
+<header class="top"><div class="wrap"><a class="brand" href="/">ION GROUP</a><nav aria-label="Principal"><a href="/#servicios">Servicios</a>${site.proyectos.length ? '<a href="/proyectos">Proyectos</a>' : ''}<a class="cta" href="/#contacto">Cotizar</a></nav></div></header>
 <main class="wrap">
 <nav class="crumbs" aria-label="Ruta"><a href="/">Inicio</a>${breadcrumbs.map((b, i) => i === breadcrumbs.length - 1 ? ` / <span aria-current="page">${esc(b.name)}</span>` : ` / <a href="${b.path}">${esc(b.name)}</a>`).join('')}</nav>
 <h1>${esc(h1)}</h1>
@@ -76,7 +78,7 @@ ${cta(`Hola ION GROUP, vi el proyecto de ${p.nombre} y quiero algo similar.`)}`
  })});
 }
 
-pages.push({path: '/proyectos', html: page({
+if (site.proyectos.length) pages.push({path: '/proyectos', html: page({
  path: '/proyectos', title: `Proyectos y clientes | ${empresa.nombre}`, h1: 'Sistemas que ya funcionan',
  description: 'Proyectos de software a medida desarrollados por ION GROUP SpA para negocios en Chile: administración, barberías y comida.',
  breadcrumbs: [{name: 'Proyectos', path: '/proyectos'}],
