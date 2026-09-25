@@ -13,7 +13,7 @@ const execFileAsync = promisify(execFile);
 // Claude Code sin ninguna herramienta (tampoco Read/Glob/Grep) y sin cargar ajustes ni MCP locales.
 // '--' separa las opciones del prompt: un texto que empiece por '-' no puede convertirse en una opción.
 export function cliCommand(engine, prompt) {
-  const bin = name => join(homedir(), '.local', 'bin', name);
+  const bin = name => join(process.env.AGENT_BIN_DIR || join(homedir(), '.local', 'bin'), name);
   if (['Claude Code', 'Antigravity', 'Arena'].includes(engine)) return [bin('claude'), ['-p', '--tools', '', '--permission-mode', 'dontAsk', '--setting-sources', '', '--strict-mcp-config', '--', prompt]];
   if (engine === 'ChatGPT / Codex') return [bin('codex'), ['exec', '--sandbox', 'read-only', '--skip-git-repo-check', '--', prompt]];
   if (engine === 'Hermes') return [bin('hermes'), [prompt]];

@@ -30,14 +30,17 @@ test('Landing pública, clics, redirección directa, desactivar y estadísticas'
  assert.equal((await visit('/nfc.html')).handled,false,'otras rutas no se interceptan');
  let [tag]=await listTags();
  assert.equal(tag.visits,1,'el bot no cuenta');assert.equal(tag.today,1);assert.equal(tag.clicks,1);assert.equal(tag.byAction.whatsapp,1);assert.equal(tag.byDevice.ios,1);
- // Cambiar el destino y renombrar sin perder estadísticas.
- await saveTag({...base,original:'duo-mesa-1',code:'duo-mesa-01',actions:[{kind:'menu',url:'https://example.com/menu-nuevo'}],redirect_action:'menu'});
- const direct=await visit('/nfc/duo-mesa-01');
+ await visit('/nfc/duo-mesa-1','curl/8.4.0');await visit('/nfc/duo-mesa-1','');
+ // El código no se puede cambiar: las placas físicas quedarían en 404.
+ await assert.rejects(saveTag({...base,original:'duo-mesa-1',code:'duo-mesa-01'}),/no se puede cambiar/);
+ // Cambiar el destino sin reprogramar: redirección directa al menú nuevo.
+ await saveTag({...base,original:'duo-mesa-1',actions:[{kind:'menu',url:'https://example.com/menu-nuevo'}],redirect_action:'menu'});
+ const direct=await visit('/nfc/duo-mesa-1');
  assert.equal(direct.status,302);assert.equal(direct.headers.Location,'https://example.com/menu-nuevo');
- [tag]=await listTags();assert.equal(tag.visits,2,'estadísticas conservadas al renombrar');
- await setActive('duo-mesa-01',false);
- assert.equal((await visit('/nfc/duo-mesa-01')).status,404);
- assert.match(await qrSVG('https://iongroup.cl','duo-mesa-01'),/^<svg/);
+ [tag]=await listTags();assert.equal(tag.visits,2,'curl y user-agent vacío no cuentan');assert.equal(tag.clicks,1,'la redirección directa no suma clics');
+ await setActive('duo-mesa-1',false);
+ assert.equal((await visit('/nfc/duo-mesa-1')).status,404);
+ assert.match(await qrSVG('https://iongroup.cl','duo-mesa-1'),/^<svg/);
  const {rows}=await pool.query('SELECT * FROM nfc_events LIMIT 1');
  assert.deepEqual(Object.keys(rows[0]).sort(),['action','campaign','code','created_at','device','id'],'sin IP ni user-agent');
 });

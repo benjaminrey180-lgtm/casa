@@ -22,6 +22,8 @@ test('Usuarios, sesiones y límite de intentos',async()=>{
  await logout(session.token);assert.equal(await sessionUser(session.token),null);
  for(let i=0;i<10;i++)await assert.rejects(login({email:'admin@ion.cl',password:'mala'},'2.2.2.2'),/incorrectos/);
  await assert.rejects(login({email:'admin@ion.cl',password:'suficientemente-larga'},'2.2.2.2'),/Demasiados/);
+ // El atacante se bloquea a sí mismo, no al dueño de la cuenta desde otra IP.
+ assert.ok((await login({email:'admin@ion.cl',password:'suficientemente-larga'},'4.4.4.4')).token);
  await assert.rejects(login({email:'nadie@ion.cl',password:'x'},'3.3.3.3'),/incorrectos/);
 });
 test('Servidor: modo local sin usuarios, túnel bloqueado y sesión obligatoria al crear usuarios',async()=>{
@@ -56,7 +58,7 @@ test('Servidor: modo local sin usuarios, túnel bloqueado y sesión obligatoria 
   const ok=await post('/api/login',{email:'admin@ion.cl',password:'suficientemente-larga'});
   assert.equal(ok.status,200);
   const cookie=ok.headers.get('set-cookie');
-  assert.match(cookie,/HttpOnly/);assert.match(cookie,/SameSite=Strict/);
+  assert.match(cookie,/^ion_session=/,'sin Secure en localhost');assert.match(cookie,/HttpOnly/);assert.match(cookie,/SameSite=Strict/);
   const auth={Cookie:cookie.split(';')[0]};
   assert.equal((await get('/api/state',auth)).status,200);
   assert.equal((await (await get('/api/me',auth)).json()).user.email,'admin@ion.cl');

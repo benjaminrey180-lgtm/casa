@@ -14,6 +14,8 @@ restart="${ION_RESTART:-sudo systemctl restart ion-office@$env_name}"
 keep=5
 
 mkdir -p "$root/releases" "$root/backups"
+exec 9>"$root/.deploy.lock"
+flock -n 9 || { echo "Ya hay un despliegue en curso para $env_name" >&2; exit 1; }
 previous="$(readlink -f "$root/current" 2>/dev/null || true)"
 release="$root/releases/$(date -u +%Y%m%dT%H%M%SZ)-${ref:0:12}"
 
@@ -43,19 +45,20 @@ healthy() {
 
 echo "→ Activando"
 switch_to "$release"
-eval "$restart"
+eval "$restart" 9>&- || echo "Aviso: el reinicio devolvió error" >&2
 if healthy "$commit"; then
   echo "✓ $env_name en $commit (health OK)"
-  ls -1d "$root"/releases/* | sort | head -n -"$keep" | xargs -r rm -rf
+  find "$root/releases" -mindepth 1 -maxdepth 1 -type d | sort | head -n -"$keep" | xargs -r rm -rf
   exit 0
 fi
 
 echo "✗ Health check falló. Volviendo a la versión anterior." >&2
 if [ -n "$previous" ]; then
   switch_to "$previous"
-  eval "$restart"
+  eval "$restart" 9>&- || echo "Aviso: el reinicio devolvió error" >&2
   healthy "$(cat "$previous/system/REVISION" 2>/dev/null || echo dev)" && echo "↺ Rollback correcto a $(basename "$previous")" >&2 || echo "!! Rollback sin health OK: revisar ya" >&2
 else
   echo "!! No hay versión anterior a la que volver" >&2
 fi
+rm -rf "$release"   # el release fallido no queda en disco
 exit 1

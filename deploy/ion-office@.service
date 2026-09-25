@@ -25,7 +25,8 @@ ProtectKernelTunables=true
 ProtectControlGroups=true
 RestrictSUIDSGID=true
 LockPersonality=true
-ReadWritePaths=/srv/ion/%i/backups
+# Los respaldos los hace deploy.sh/cron, no el servicio. Si en el servidor se usan agentes CLI
+# (AGENT_BIN_DIR), agregar aquí sus directorios de estado, p. ej. ReadWritePaths=/srv/ion/.claude
 
 [Install]
 WantedBy=multi-user.target

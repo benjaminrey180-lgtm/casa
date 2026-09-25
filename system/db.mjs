@@ -43,10 +43,32 @@ export async function initDB() {
         throw e;
       }
     }
+    await verifySchema(client, dir);
   } finally {
     await client.query('SELECT pg_advisory_unlock(4310)').catch(() => {});
     client.release();
   }
+}
+
+// CREATE TABLE IF NOT EXISTS no altera una tabla que ya existía con otra forma. Tras migrar se compara
+// cada columna declarada en migrations/*.sql con la base real y se detiene el arranque si falta alguna.
+export function expectedColumns(sqlFiles) {
+  const tables = {};
+  for (const sql of sqlFiles) {
+    for (const [, table, body] of sql.matchAll(/CREATE TABLE IF NOT EXISTS (\w+) \(([\s\S]*?)\n\s*\);/g)) {
+      tables[table] = body.split('\n').map(l => l.trim()).filter(l => /^[a-z_]+ [A-Z]/.test(l)).map(l => l.split(' ')[0]);
+    }
+  }
+  return tables;
+}
+
+async function verifySchema(client, dir) {
+  const files = (await readdir(dir)).filter(f => f.endsWith('.sql')).sort();
+  const expected = expectedColumns(await Promise.all(files.map(f => readFile(new URL(f, dir), 'utf8'))));
+  const {rows} = await client.query("SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = current_schema()");
+  const actual = new Set(rows.map(r => `${r.table_name}.${r.column_name}`));
+  const missing = Object.entries(expected).flatMap(([t, cols]) => cols.filter(c => !actual.has(`${t}.${c}`)).map(c => `${t}.${c}`));
+  if (missing.length) throw Error(`La base no coincide con el esquema esperado. Faltan columnas: ${missing.join(', ')}. No se modificó nada; revisa la base antes de continuar.`);
 }
 
 export { pool };

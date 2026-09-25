@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 permissions:
@@ -44,6 +45,13 @@ jobs:
       - run: npm test
       - name: Migraciones idempotentes
         run: node --input-type=module -e "const {initDB,pool}=await import('./db.mjs');await initDB();await initDB();await pool.end()"
+
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: shellcheck deploy/deploy.sh system/scripts/*.sh
 
   web:
     runs-on: ubuntu-latest

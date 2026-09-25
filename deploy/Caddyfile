@@ -1,14 +1,14 @@
 # Proxy inverso con HTTPS automático (Let's Encrypt) para el servidor de ION GROUP.
 # ANTES DE USAR: auditar lo que corre hoy en 62.238.117.110 (nginx/apache/certbot) y copiar su
 # configuración a deploy/legacy/. No reemplazar la configuración actual sin respaldo.
-
 {
 	email iongroupspa@gmail.com
 }
 
 (seguridad) {
 	header {
-		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		# Sin includeSubDomains hasta confirmar que duo/capitalbarber/goldenroll funcionan por HTTPS.
+		Strict-Transport-Security "max-age=31536000"
 		X-Content-Type-Options nosniff
 		Referrer-Policy strict-origin-when-cross-origin
 		-Server
@@ -23,10 +23,10 @@ www.iongroup.cl {
 iongroup.cl {
 	import seguridad
 	# Placas NFC/QR y webhooks de Meta/Discord: únicas rutas públicas de Oficina ION.
-	@oficina path /nfc/* /webhooks/meta /webhooks/discord
-	reverse_proxy @oficina 127.0.0.1:4310 {
-		header_up Host {upstream_hostport}
-	}
+	# Rutas exactas (path_regexp distingue mayúsculas). El Host original llega a Node, que rechaza (421)
+	# cualquier ruta del panel pedida con Host iongroup.cl.
+	@oficina path_regexp ^/(nfc/[a-z0-9-]{3,40}(/a/[a-z0-9-]{1,40})?/?|webhooks/(meta|discord))$
+	reverse_proxy @oficina 127.0.0.1:4310
 	# Web corporativa estática.
 	root * /srv/ion/web/current
 	try_files {path}.html {path} {path}/index.html

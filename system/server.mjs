@@ -17,7 +17,7 @@ import {listClients,saveClient,checkClients,search,CATEGORIES,STATUSES,MODULES} 
 import {handlePublic as handleNFC,listTags,saveTag,setActive,qrSVG,ACTION_KINDS} from './nfc.mjs';
 // Dominio público donde viven las placas (iongroup.cl/nfc/[código]).
 const nfcBase=(process.env.NFC_PUBLIC_BASE||'https://iongroup.cl').replace(/\/$/,'');
-import {initAuth,login,logout,sessionUser,userCount,readCookie,sessionCookie,isLocalHost,PANEL_ROLES} from './auth.mjs';
+import {initAuth,login,logout,sessionUser,userCount,readCookie,sessionCookie,isLocalHost,clientIP,purgeSessions,PANEL_ROLES} from './auth.mjs';
 await initDB();
 await initAuth();
 const {rowCount: sectorCount} = await pool.query('SELECT 1 FROM sectors');
@@ -45,7 +45,7 @@ const server=http.createServer(async(req,res)=>{
   // Toda escritura exige un Origin permitido (los navegadores lo envían siempre en POST).
   if(req.method!=='GET'&&!allowedOrigin(req.headers.origin))return json(403,{error:'Origen no permitido'});
   // Autenticación: público solo lo necesario para iniciar sesión.
-  if(req.method==='POST'&&url.pathname==='/api/login'){let input;input=await readJSON(req);const session=await login(input||{},req.socket.remoteAddress);res.setHeader('Set-Cookie',sessionCookie(session.token,session.expires,!isLocalHost(req)));return json(200,{user:session.user});}
+  if(req.method==='POST'&&url.pathname==='/api/login'){let input;input=await readJSON(req);const session=await login(input||{},clientIP(req));res.setHeader('Set-Cookie',sessionCookie(session.token,session.expires,!isLocalHost(req)));return json(200,{user:session.user});}
   if(req.method==='POST'&&url.pathname==='/api/logout'){await logout(readCookie(req));res.setHeader('Set-Cookie',sessionCookie('',null,!isLocalHost(req)));return json(200,{ok:true});}
   const publicPaths=['/login.html','/login.js','/style.css','/nfc.html','/api/me','/manifest.webmanifest','/assets/ion-group-logo.jpeg','/assets/ion-group-logo-480.webp','/assets/ion-group-logo-960.webp','/assets/icon-192.png','/assets/icon-512.png','/assets/apple-touch-icon.png'];
   const user=await sessionUser(readCookie(req));
@@ -104,6 +104,7 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==='GET'&&staticFiles.includes(req.url)){
    const name=req.url==='/'?'index.html':req.url.slice(1);
    // Los assets de imagen se cachean un día; HTML/JS/CSS se revalidan en cada carga.
+   if(name==='nfc.html')res.setHeader('Content-Security-Policy',"default-src 'self'; style-src 'unsafe-inline'; img-src 'self'; frame-ancestors 'none'");
    res.writeHead(200,{'Content-Type':mime[name.split('.').pop()],'Cache-Control':name.startsWith('assets/')?'public, max-age=86400':'no-cache'});
    return res.end(await readFile(new URL(`./public/${name}`,import.meta.url)));
   }
@@ -111,5 +112,6 @@ const server=http.createServer(async(req,res)=>{
  }catch(e){console.error(e.message);if(!res.headersSent)json(e.status||500,{error:e.status?e.message:'No se pudo completar la operación'});else res.end();}
 });
 // Monitoreo de sistemas de clientes cada 10 minutos (MONITOR_CLIENTS=off lo desactiva).
+setInterval(()=>purgeSessions().catch(e=>console.error('Sesiones:',e.message)),3600000).unref();
 if(process.env.MONITOR_CLIENTS!=='off'){const run=()=>checkClients().catch(e=>console.error('Monitoreo:',e.message));setTimeout(run,30000).unref();setInterval(run,600000).unref();}
 server.listen(Number(process.env.PORT||4310),'127.0.0.1',()=>console.log(`ION: http://127.0.0.1:${server.address().port}`));

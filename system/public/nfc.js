@@ -49,19 +49,27 @@
   row.dataset.id = a.id || '';
   row.append(kind, label, url, remove); byId('nfcActionRows').append(row); syncRedirect();
  }
- function rows() { return [...byId('nfcActionRows').children].map(r => { const [kind, label, url] = r.querySelectorAll('select,input'); return {id: r.dataset.id || undefined, kind: kind.value, label: label.value.trim(), url: url.value.trim()}; }); }
+ // Mismos ids que asigna el servidor (tipo, y tipo-índice si se repite) para que la redirección directa coincida.
+ function rows() {
+  const ids = new Set();
+  return [...byId('nfcActionRows').children].map((r, i) => {
+   const [kind, label, url] = r.querySelectorAll('select,input');
+   let id = r.dataset.id || kind.value; while (ids.has(id)) id += '-' + i; ids.add(id);
+   return {id, kind: kind.value, label: label.value.trim(), url: url.value.trim()};
+  });
+ }
  function syncRedirect(selected) {
   const select = byId('nfcRedirect'), current = selected ?? select.value;
   select.replaceChildren(el('option', 'Mostrar la página con botones'));
   select.firstChild.value = '';
-  rows().forEach((a, i) => { const id = a.id || a.kind; const o = el('option', `Ir directo a: ${a.label || state.kinds[a.kind]}`); o.value = id; select.append(o); });
+  rows().forEach(a => { const id = a.id; const o = el('option', `Ir directo a: ${a.label || state.kinds[a.kind]}`); o.value = id; select.append(o); });
   select.value = [...select.options].some(o => o.value === current) ? current : '';
  }
  function open(tag) {
   editing = tag ? tag.code : null;
   byId('nfcDialogTitle').textContent = tag ? 'Editar placa' : 'Nueva placa';
   byId('nfcForm').reset(); byId('nfcActionRows').replaceChildren();
-  byId('nfcCode').value = tag?.code || ''; byId('nfcClient').value = tag?.client || ''; byId('nfcTitle').value = tag?.title || '';
+  byId('nfcCode').value = tag?.code || ''; byId('nfcCode').readOnly = !!tag; byId('nfcClient').value = tag?.client || ''; byId('nfcTitle').value = tag?.title || '';
   byId('nfcSubtitle').value = tag?.subtitle || ''; byId('nfcCampaign').value = tag?.campaign || ''; byId('nfcActive').checked = tag ? tag.active : true;
   (tag?.actions || [{kind: 'review'}, {kind: 'instagram'}, {kind: 'whatsapp'}]).forEach(actionRow);
   syncRedirect(tag?.redirect_action || '');

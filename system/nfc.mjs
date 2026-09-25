@@ -56,7 +56,7 @@ export function deviceOf(ua = '') {
  return 'otro';
 }
 // Enlaces previsualizados por apps y buscadores: no cuentan como accesos.
-const isBot = ua => /bot|crawl|spider|preview|facebookexternalhit|whatsapp|slack|discord|telegram/i.test(ua);
+const isBot = ua => !ua || /bot|crawl|spider|preview|facebookexternalhit|whatsapp|slack|discord|telegram|curl|wget|python|headless|go-http|java\/|okhttp|axios|node-fetch|libwww|httpclient/i.test(ua);
 
 export async function listTags() {
  const {rows} = await pool.query(`
@@ -78,6 +78,8 @@ export async function saveTag(input) {
  const t = validateTag(input);
  // original = código anterior cuando se renombra; sin él, crear falla si el código ya existe.
  const original = input.original ? String(input.original) : null;
+ // El código es la URL grabada en las placas físicas: cambiarlo las dejaría en 404.
+ if (original && original !== t.code) throw bad('El código no se puede cambiar: las placas ya grabadas apuntan a él. Crea una placa nueva si necesitas otra URL.');
  if (original) {
   const {rowCount} = await pool.query(`UPDATE nfc_tags SET code=$1, client=$2, title=$3, subtitle=$4, campaign=$5, actions=$6, redirect_action=$7, active=$8, updated_at=now() WHERE code=$9`,
    [t.code, t.client, t.title, t.subtitle, t.campaign, JSON.stringify(t.actions), t.redirect_action, t.active, original]).catch(e => { if (e.code === '23505') throw Object.assign(Error('Ya existe una placa con ese código.'), {status: 409}); throw e; });
@@ -138,7 +140,8 @@ export async function handlePublic(req, res, url) {
  }
  await record(tag, 'view', ua);
  const direct = tag.redirect_action && tag.actions.find(a => a.id === tag.redirect_action);
- if (direct) { await record(tag, direct.id, ua); go(direct); return true; }
+ // Redirección directa: se cuenta la vista; no se suma un clic que el usuario no hizo.
+ if (direct) { go(direct); return true; }
  const buttons = tag.actions.map(a => `<a class="b" href="/nfc/${esc(tag.code)}/a/${esc(a.id)}" rel="noopener">${esc(a.label)}</a>`).join('');
  html(200, page(tag.title, `<h1>${esc(tag.title)}</h1>${tag.subtitle ? `<p>${esc(tag.subtitle)}</p>` : '<p></p>'}<nav aria-label="Opciones de ${esc(tag.title)}">${buttons}</nav>`));
  return true;
