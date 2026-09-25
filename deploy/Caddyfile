@@ -1,0 +1,61 @@
+# Proxy inverso con HTTPS automático (Let's Encrypt) para el servidor de ION GROUP.
+# ANTES DE USAR: auditar lo que corre hoy en 62.238.117.110 (nginx/apache/certbot) y copiar su
+# configuración a deploy/legacy/. No reemplazar la configuración actual sin respaldo.
+
+{
+	email iongroupspa@gmail.com
+}
+
+(seguridad) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+	encode zstd gzip
+}
+
+www.iongroup.cl {
+	redir https://iongroup.cl{uri} permanent
+}
+
+iongroup.cl {
+	import seguridad
+	# Placas NFC/QR y webhooks de Meta/Discord: únicas rutas públicas de Oficina ION.
+	@oficina path /nfc/* /webhooks/meta /webhooks/discord
+	reverse_proxy @oficina 127.0.0.1:4310 {
+		header_up Host {upstream_hostport}
+	}
+	# Web corporativa estática.
+	root * /srv/ion/web/current
+	try_files {path} {path}.html {path}/index.html
+	file_server
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+	@assets path *.css *.js *.png *.jpg *.jpeg *.webp *.avif *.svg *.woff2
+	header @assets Cache-Control "public, max-age=604800"
+}
+
+# Panel interno. Decisión pendiente del dueño: subdominio propio (recomendado, con la autenticación
+# de la app) o solo por VPN/SSH. Si se habilita, definir PUBLIC_ORIGIN=https://oficina.iongroup.cl.
+# oficina.iongroup.cl {
+# 	import seguridad
+# 	reverse_proxy 127.0.0.1:4310
+# }
+
+# Staging (no indexable).
+# staging.iongroup.cl {
+# 	import seguridad
+# 	header X-Robots-Tag "noindex, nofollow"
+# 	reverse_proxy 127.0.0.1:4311
+# }
+
+# Sistemas de clientes: duo, capitalbarber y goldenroll ya existen en DNS apuntando a este servidor.
+# NO cambiarlos hasta documentar qué aplicación y puerto atiende cada uno hoy. Plantilla:
+# duo.iongroup.cl {
+# 	import seguridad
+# 	reverse_proxy 127.0.0.1:PUERTO_ACTUAL
+# }

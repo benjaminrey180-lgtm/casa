@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  oficina-ion:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: system
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ion
+          POSTGRES_PASSWORD: ion
+          POSTGRES_DB: ion_ci_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ion"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://ion:ion@localhost:5432/ion_ci_test
+      DATABASE_SSL: disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: system/package-lock.json
+      - run: npm ci
+      - name: Revisión de sintaxis
+        run: for f in *.mjs scripts/*.mjs public/*.js; do node --check "$f"; done
+      - name: Auditoría de dependencias
+        run: npm audit --omit=dev --audit-level=high
+      - run: npm test
+      - name: Migraciones idempotentes
+        run: node --input-type=module -e "const {initDB,pool}=await import('./db.mjs');await initDB();await initDB();await pool.end()"
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: JSON-LD válido
+        run: |
+          python3 - <<'PY'
+          import json, re, pathlib
+          for page in pathlib.Path('web').rglob('*.html'):
+              for block in re.findall(r'<script type="application/ld\+json">(.*?)</script>', page.read_text(), re.S):
+                  json.loads(block)
+              print('ok', page)
+          PY

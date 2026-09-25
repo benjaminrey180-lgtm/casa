@@ -10,6 +10,8 @@ const agents = ['Hermes', 'Claude Code', 'Antigravity', 'ChatGPT / Codex', 'Aren
 const defaults = ['Dirección', 'Marketing', 'Finanzas', 'Ventas', 'Operaciones', 'Tecnología', 'Atención al cliente'];
 import { pool, initDB, checkDB } from './db.mjs';
 const {version}=JSON.parse(await readFile(new URL('./package.json',import.meta.url),'utf8'));
+// REVISION lo escribe deploy/deploy.sh con el commit desplegado; el health check lo compara.
+const revision=(await readFile(new URL('./REVISION',import.meta.url),'utf8').catch(()=>'')).trim()||'dev';
 import {allowedOrigin,allowedHost,securityHeaders} from './security.mjs';
 import {handlePublic as handleNFC,listTags,saveTag,setActive,qrSVG,ACTION_KINDS} from './nfc.mjs';
 // Dominio público donde viven las placas (iongroup.cl/nfc/[código]).
@@ -34,7 +36,7 @@ const server=http.createServer(async(req,res)=>{
  try {
   const url=new URL(req.url,'http://localhost');
   if(['/webhooks/meta','/webhooks/discord'].includes(url.pathname)){await integrations.webhook(req,res,url);return;}
-  if(['/health','/api/health'].includes(url.pathname)&&req.method==='GET'){try{const dbMs=await checkDB();return json(200,{status:'ok',db:'ok',dbMs,uptime:Math.round(process.uptime()),version});}catch{return json(503,{status:'error',db:'error',version});}}
+  if(['/health','/api/health'].includes(url.pathname)&&req.method==='GET'){try{const dbMs=await checkDB();return json(200,{status:'ok',db:'ok',dbMs,uptime:Math.round(process.uptime()),version,revision});}catch{return json(503,{status:'error',db:'error',version});}}
   // Placas NFC/QR: públicas y servidas desde el dominio de ION, por eso van antes del control de host.
   if(url.pathname.startsWith('/nfc/')&&await handleNFC(req,res,url))return;
   if(!allowedHost(req.headers.host))return json(421,{error:'Host no permitido. Si usas un túnel, define PUBLIC_ORIGIN.'});
